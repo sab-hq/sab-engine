@@ -101,8 +101,8 @@ Each layer has one job and doesn't reach into another layer's responsibility:
 - **Modules** just *do the work*, dumbly and reliably.
 - The **Execution Environment** abstracts *where* — so on-prem vs. cloud is invisible to everything above it.
 
-**Tech Stack Direction (see `open-questions.md`, TS-1/TS-2/TS-3)**
-Current recommendation, still open for confirmation: **C#/.NET** for both the orchestration engine and AI agent layer (the latter potentially using Microsoft's Semantic Kernel), and **PostgreSQL** for state persistence. The .NET choice is deliberate beyond technical merit — native PowerShell interop and building on Microsoft's own stack directly support the partnership positioning in Sections 6 and 8. Modules themselves stay in PowerShell/Bash regardless, per the module contract (4.2) — this only affects what the engine and agent are written in.
+**Tech Stack (see `open-questions.md`, TS-1/TS-2/TS-3 — confirmed)**
+**C#/.NET** for both the orchestration engine and AI agent layer (the latter using Microsoft's Semantic Kernel), and **PostgreSQL** for state persistence. The .NET choice is deliberate beyond technical merit — native PowerShell interop and building on Microsoft's own stack directly support the partnership positioning in Sections 6 and 8. Modules themselves stay in PowerShell/Bash regardless, per the module contract (4.2) — this only affects what the engine and agent are written in. **License (LM-1, confirmed): Apache 2.0.**
 
 > *(Further architectural detail — diagrams, data flow specifics — to be added)*
 
