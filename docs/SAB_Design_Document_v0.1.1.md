@@ -18,9 +18,9 @@
    - 4.2 Module Library System
    - 4.3 AI Agent Layer
    - 4.4 Execution Environment
-   - 4.5 Shared Knowledge Base (SAB-KB)
+   - 4.5 Engine State Store *(renamed from "Shared Knowledge Base (SAB-KB)" — see RC-3)*
 5. [Extensibility and Plugin System](#5-extensibility-and-plugin-system)
-   - 5.1 SAB Marketplace
+   - 5.1 SAB Engine Marketplace *(renamed from "SAB Marketplace" — see RC-3)*
 6. [Integration with Existing Enterprise Tools](#6-integration-with-existing-enterprise-tools)
 7. [Security and Compliance Considerations](#7-security-and-compliance-considerations)
 8. [Existing Solutions and Learnings](#8-existing-solutions-and-learnings)
@@ -38,14 +38,14 @@ SAB (System Administration Builder) is an open system that standardizes and auto
 **The Problem**
 Much of system administration is process that exists mostly in people's heads and in one-off scripts: a specific SA knows how to safely patch a server, but that knowledge is rarely captured in a standardized, reusable, auditable way. This makes the work slow to onboard new people into, inconsistent across teams, and risky to automate naively — a bad script run against production can cause real damage. Existing automation and RPA tools tend to be either too broad and generic, or expensive and enterprise-locked, without being purpose-built for the way sysadmins actually think about their work.
 
-This isn't a hypothetical problem — it's a documented, current one. Industry research (see `market-research.md`) shows IT teams lose roughly a third of their working capacity to manual, repetitive work, and sysadmin burnout runs close to 49%. More specifically, a 2026 industry survey identified "brain debt" as a defining pattern: a small number of senior people end up carrying disproportionate institutional knowledge and decision weight, becoming the default escalation path for anything risky — exactly the knowledge-silo problem SAB-KB is designed to address.
+This isn't a hypothetical problem — it's a documented, current one. Industry research (see `market-research.md`) shows IT teams lose roughly a third of their working capacity to manual, repetitive work, and sysadmin burnout runs close to 49%. More specifically, a 2026 industry survey identified "brain debt" as a defining pattern: a small number of senior people end up carrying disproportionate institutional knowledge and decision weight, becoming the default escalation path for anything risky — this is the exact knowledge-silo problem the separate `sab-kb` product (SAB's Knowledge & Documentation Engine) is built to address, by capturing that tribal knowledge from Email/Teams before it walks out the door. `sab-engine` — described in the rest of this document — is a related but distinct product: it automates the execution side of sysadmin work rather than the knowledge-capture side. See Section 9 and `open-questions.md` (RC-1 through RC-5) for how these two products currently relate.
 
 There's also a live opportunity in the market: Microsoft deprecated WSUS in 2024, and most organizations still running it haven't fully migrated to a replacement as of mid-2026. Rather than positioning against WSUS, SAB's first connector is designed to work alongside it — reading existing WSUS/SCCM data and standardizing the workflow around it — which is both a practical, low-friction entry point for organizations not ready to rip out existing infrastructure, and a foundation for treating Microsoft as a partner rather than something SAB is trying to replace (see Section 6).
 
 **The Approach**
 SAB is built around a simple distinction: **modules** are small, reusable, well-tested units of work (built on tools SAs already trust — PowerShell, Bash, IaC), and **workflows** are the ordered recipes that string modules together to accomplish a real task, mirroring the process an SA would normally walk through manually. An AI agent sits on top, proposing what to run and why — but every action starts in a **recommend-and-approve** mode, with a human in the loop, and every module ships with a tested rollback path from day one. Reliability is earned in stages, not assumed.
 
-A shared knowledge base (SAB-KB) keeps the AI agent, the orchestration engine, and humans working from the same information — what's been run, what's worked, what hasn't — so trust and autonomy can grow over time based on an actual track record, not a leap of faith.
+Within `sab-engine` itself, an internal state store (Section 4.5) keeps the AI agent, the orchestration engine, and humans working from the same information about this engine's own runs — what's been executed, what's worked, what hasn't — so trust and autonomy can grow over time based on an actual track record, not a leap of faith. This is a narrower thing than the `sab-kb` product; see Section 4.5 for the current scope and RC-1/RC-2 for how (or whether) the two connect in the future.
 
 **Why It Matters**
 For SAs and SEs, SAB turns tribal knowledge into standardized, shareable, auditable process — without asking anyone to trust a black box on day one. For the broader community, an open core means the module library grows through real-world contribution rather than one company's roadmap alone.
@@ -92,7 +92,7 @@ The system is designed around how an SA/SE actually works: they have a job to do
 4. **Orchestration Engine** — Once approved, drives execution: calls each module in sequence, tracks state (running/succeeded/failed), and triggers rollback if something breaks.
 5. **Module Library** — Supplies the actual units of work the engine calls. Modules are reusable and environment-agnostic where possible.
 6. **Execution Environment** — Reaches out and runs the work against the actual target system (e.g. WinRM for on-prem to start), abstracted so cloud/hybrid connectors can slot in later without changing anything upstream.
-7. **Feedback Loop** — Results and logs flow back into the orchestration engine's state, into an audit log, and into **SAB-KB** (see Section 4.5) — the shared knowledge base that keeps the AI agent, orchestration engine, and humans all working from the same information, so future recommendations improve over time.
+7. **Feedback Loop** — Results and logs flow back into the orchestration engine's state, into an audit log, and into the **Engine State Store** (see Section 4.5) — which keeps the AI agent, orchestration engine, and humans all working from the same information about this engine's own runs, so future recommendations improve over time.
 
 **Design Philosophy**
 Each layer has one job and doesn't reach into another layer's responsibility:
@@ -181,7 +181,7 @@ The AI agent is the "what and why" layer (see Section 3). It doesn't execute any
 **Inputs the agent needs**
 - The **selected workflow** (the recipe) the SA/SE chose
 - **Current target system state** — e.g. current patch level, last patch date, uptime requirements, known issues
-- **Historical data** — past runs of this workflow against this system or similar systems (successes, failures, rollbacks triggered), queried from **SAB-KB** (see Section 4.5)
+- **Historical data** — past runs of this workflow against this system or similar systems (successes, failures, rollbacks triggered), queried from the **Engine State Store** (see Section 4.5)
 - **Constraints** — maintenance windows, blackout periods, compliance requirements
 
 **What the agent produces (the "proposal")**
@@ -223,17 +223,18 @@ The connector itself should be a pluggable interface — a defined contract (sim
 
 > *(Further detail — e.g. exact connector interface spec — to be added)*
 
-### 4.5 Shared Knowledge Base (SAB-KB)
-- What is SAB-KB and why does it exist as its own component?
+### 4.5 Engine State Store
+*(Renamed from "Shared Knowledge Base (SAB-KB)" — see `open-questions.md` RC-3. The name "SAB-KB" now belongs exclusively to the separate `sab-kb` commercial product; this component keeps `sab-engine`'s original narrow scope under a name that doesn't collide.)*
+- What is the Engine State Store and why does it exist as its own component?
 - What information lives there, and who/what reads and writes it?
 - How does it relate to the other components?
 
-> **⚠️ Flagged for rework:** everything below describes SAB-KB as a support component internal to `sab-engine`'s own architecture (run history, target state, feeding the AI agent). That's now known to be too narrow — `sab-kb` is actually a much larger, separately-developed commercial product (MSP knowledge/documentation engine, its own agents, its own connectors, its own business model — see repo breakdown in Section 9, Phase 0). This section hasn't been rewritten to reflect that yet. Treat the content below as `sab-engine`'s internal needs only, not a description of the `sab-kb` product itself.
+**Resolution (see `open-questions.md` RC-1, RC-2):** `sab-engine` and `sab-kb` are independent products for now, with no assumed integration. `sab-engine` gets its own small internal store — described below — scoped only to what the orchestration engine and AI agent need (run history, target state). Whether `sab-engine`'s AI agent ever queries `sab-kb` for broader context is a real future question, deliberately left open rather than assumed, since `sab-engine` isn't being built yet (see RC-5 below).
 
 **Role in the System**
-SAB-KB is the shared memory of the system — the common source of truth that the AI agent, orchestration engine, module library, and humans all read from and write to, so everyone (and everything) stays on the same page. Where Sections 4.1–4.4 describe components that *do* things, SAB-KB is the component that *remembers* things and makes that memory usable.
+The Engine State Store is `sab-engine`'s own memory — the record of what's been run, against what, and with what result, that the AI agent, orchestration engine, and humans all read from and write to within this repo alone. Where Sections 4.1–4.4 describe components that *do* things, this is the component that *remembers* things and makes that memory usable.
 
-This makes the "feedback loop" described in Section 3 concrete: instead of results simply generating logs that disappear into storage, they flow into SAB-KB, and everything upstream — especially the AI agent — actively queries SAB-KB before proposing a plan.
+This makes the "feedback loop" described in Section 3 concrete: instead of results simply generating logs that disappear into storage, they flow into this store, and the AI agent actively queries it before proposing a plan.
 
 **What it likely contains**
 - **Run history** — every workflow execution: what was run, against what target, what the outcome was, whether rollback was triggered
@@ -243,15 +244,15 @@ This makes the "feedback loop" described in Section 3 concrete: instead of resul
 - **Human-authored documentation/notes** — SAs and SEs annotating systems, workflows, or past incidents with context an AI agent or automated log can't infer on its own
 
 **Who/what interacts with it**
-- **AI Agent Layer (4.3)** — queries SAB-KB as a primary input before proposing a plan; writes back its reasoning and outcomes after a run
+- **AI Agent Layer (4.3)** — queries this store as a primary input before proposing a plan; writes back its reasoning and outcomes after a run
 - **Orchestration Engine (4.1)** — writes execution results and state as a workflow runs
 - **Humans (SAs/SEs)** — browse it directly, add context/notes, and use it to understand *why* the system behaved a certain way — this is also what makes the audit trail in Section 7 meaningful rather than just raw logs
-- **Module Library (4.2)** — module/workflow metadata may be published into or synced with SAB-KB for discoverability
+- **Module Library (4.2)** — module/workflow metadata may be published into or synced with this store for discoverability
 
 **Why this matters for trust and gradual autonomy**
-Per the reliability-first principle (Section 2), SAB-KB is arguably what *earns* the system more autonomy over time — a system with no memory has to be trusted blindly each time, but one that can point to "this exact workflow has succeeded cleanly against this exact class of system 40 times" gives both the AI agent and the human approver a real basis for confidence.
+Per the reliability-first principle (Section 2), this store is arguably what *earns* the system more autonomy over time — a system with no memory has to be trusted blindly each time, but one that can point to "this exact workflow has succeeded cleanly against this exact class of system 40 times" gives both the AI agent and the human approver a real basis for confidence.
 
-**Repo Structure (decided):** SAB-KB is its own repo — a fourth repo alongside the core orchestration engine, module library, and commercial layer, all under the **`sab-hq`** GitHub organization (confirmed available and claimed). This elevates SAB-KB to a first-class component with its own codebase, release cadence, and (eventually) its own interface for humans to browse/annotate directly, rather than treating it as something bolted onto the orchestration engine's state. This updates the earlier AR-3 recommendation (`open-questions.md`) — a dedicated repo doesn't necessarily mean a separate running service on day one (the Phase 1 logical-layer starting point can still apply architecturally), but it does mean SAB-KB's code, schema, and query interface live and version independently from day one.
+**Repo Structure:** Lives *inside* `sab-engine` — **not** its own repo. This reverses the earlier AR-3 decision (which gave "SAB-KB" its own repo) now that the name and the actual product it referred to have diverged: the thing that earned a dedicated repo was always the real `sab-kb` product, not this narrow internal store. A small state store scoped to one repo's own needs doesn't need independent versioning the way a whole separate product does.
 
 > *(Further detail — e.g. data model, query interface for the AI agent, human-facing UI — to be added)*
 
@@ -274,7 +275,7 @@ Together, these two contracts are what let SAB grow outward — new workflows, n
 Since the core engine and module library are open source, the contracts themselves function as the contribution guidelines: a submission is straightforward to validate (does it meet the contract? does it have tests and a rollback path?) rather than requiring subjective review of "does this fit the architecture." This keeps the bar for contribution clear and consistent as the community grows.
 
 **Third-Party Integration API**
-Beyond modules and connectors, there's likely a need for a broader integration API — allowing external tools (ticketing systems, monitoring platforms, ChatOps tools like Slack) to trigger workflows or read status/results. This would sit alongside SAB-KB (4.5) as a read/write surface, but scoped for external, non-core consumers.
+Beyond modules and connectors, there's likely a need for a broader integration API — allowing external tools (ticketing systems, monitoring platforms, ChatOps tools like Slack) to trigger workflows or read status/results. This would sit alongside the Engine State Store (4.5) as a read/write surface, but scoped for external, non-core consumers.
 
 **Positioning Implication**
 Per the partnership-not-competitor stance established in Section 8, these contracts (module, connector, and integration API) should be treated as the primary path for platforms like Microsoft or UiPath to eventually integrate with SAB, rather than assuming SAB needs to out-build them. Keeping these interfaces clean, stable, and well-documented is worth prioritizing specifically because it's what makes future partnership technically easy, not just possible in principle.
@@ -283,7 +284,8 @@ Per the partnership-not-competitor stance established in Section 8, these contra
 
 ---
 
-### 5.1 SAB Marketplace
+### 5.1 SAB Engine Marketplace
+*(Renamed from "SAB Marketplace" — see `open-questions.md` RC-3. `sab-kb`'s docs use "SAB Marketplace" for a different thing — its Email/Teams/PSA connector framework. This is `sab-engine`'s marketplace specifically, for modules and connectors that plug into the orchestration engine.)*
 
 **What it is**
 A dedicated place where users — community members, third-party developers, and eventually vendors — can publish and (later) sell add-ons: modules, connectors, and full workflow packs built on the extensibility contracts above. It's the commercial expression of the extensibility model, and ties directly into the business model established earlier (open-core, monetization via the commercial layer).
@@ -291,7 +293,7 @@ A dedicated place where users — community members, third-party developers, and
 **Relationship to the rest of the system**
 - The marketplace doesn't replace the open source module library (4.2) — it sits alongside/on top of it. Community modules can still be free and live in the open source repo; the marketplace is specifically for discoverability and (eventually) commerce.
 - Anything listed in the marketplace still has to satisfy the module or connector contract — the marketplace is a distribution and monetization layer, not a different technical standard. This keeps quality/trust consistent regardless of whether something is free or paid.
-- Likely lives in or alongside the **commercial layer repo** (per the four-repo structure — core engine, module library, SAB-KB, commercial layer) since it's part of the monetization strategy, even in its free starting phase.
+- Likely lives in or alongside the **commercial layer repo** (per the four-repo structure — core engine, module library, `sab-kb`, commercial layer) since it's part of the monetization strategy, even in its free starting phase.
 - Maps naturally onto the tiered trust model (MP-2, `open-questions.md`): **Community** and **Verified** tiers stay free, and the **Certified** tier — hardened, tested, support-backed — is where the Fedora/RHEL-style paid value concentrates (see Section 1's business model). This gives the marketplace a monetization mechanism consistent with early Red Hat's actual approach, rather than an app-store-style paywall on functionality itself.
 
 **Phased rollout**
@@ -343,17 +345,17 @@ This means the module and connector contracts (Section 4.2, 4.4, 5) should be de
 **This section pulls together security concerns already surfaced elsewhere in the design**, rather than introducing an unrelated set of concepts — security here is a property of how the other components are built, not a separate layer bolted on top.
 
 **Secrets Management**
-Raised in Section 4.4: the execution environment needs to authenticate to target systems (e.g. via WinRM) without credentials passing through or being visible to modules or the AI agent. Likely approach: credentials are resolved by the execution environment layer at the point of connection, pulled from a dedicated secrets store (vault-style), and never appear in workflow definitions, module code, logs, or SAB-KB in plaintext. Modules and the AI agent should only ever see a reference/handle, never the secret itself. **Design direction (see `open-questions.md`, SE-1):** support HashiCorp Vault as a pluggable backend for organizations already running it, with native OS credential stores (Windows Credential Manager, Linux keyring) as a simpler default — avoid building custom secrets infrastructure.
+Raised in Section 4.4: the execution environment needs to authenticate to target systems (e.g. via WinRM) without credentials passing through or being visible to modules or the AI agent. Likely approach: credentials are resolved by the execution environment layer at the point of connection, pulled from a dedicated secrets store (vault-style), and never appear in workflow definitions, module code, logs, or the Engine State Store in plaintext. Modules and the AI agent should only ever see a reference/handle, never the secret itself. **Design direction (see `open-questions.md`, SE-1):** support HashiCorp Vault as a pluggable backend for organizations already running it, with native OS credential stores (Windows Credential Manager, Linux keyring) as a simpler default — avoid building custom secrets infrastructure.
 
 **Authentication and Authorization**
 Several distinct identities interact with SAB and need appropriately scoped access:
 - **Humans (SAs/SEs)** — who can approve workflow runs, who can author/publish modules, who can administer the system
-- **The AI agent** — needs read access to SAB-KB and target state, and the ability to *propose* plans, but per Section 2's reliability principle, should not have standing authorization to execute against production without the human approval gate
+- **The AI agent** — needs read access to the Engine State Store and target state, and the ability to *propose* plans, but per Section 2's reliability principle, should not have standing authorization to execute against production without the human approval gate
 - **The orchestration engine** — needs scoped credentials to actually connect to target systems, ideally least-privilege and per-environment rather than one broad standing credential
 - **Marketplace contributors/third parties** (Section 5.1) — a separate identity/permission tier, since their trust level starts lower than core-team-authored modules
 
 **Audit Logging and Compliance Tracking**
-This is largely already designed — Section 4.1 (orchestration engine) logs every action taken, and Section 4.5 (SAB-KB) is where that history persists and becomes queryable. What Section 7 adds on top:
+This is largely already designed — Section 4.1 (orchestration engine) logs every action taken, and Section 4.5 (the Engine State Store) is where that history persists and becomes queryable. What Section 7 adds on top:
 - Audit records need to be **tamper-evident** — an audit trail that could be silently edited after the fact isn't trustworthy for compliance purposes
 - Records should capture **who/what approved a plan** (a specific human, not just "approved"), which matters both for accountability and for satisfying compliance frameworks that require documented change approval
 - Retention requirements likely vary by industry (this connects to the "industry-specific compliance packs" idea from the marketplace/business model discussion) — worth treating retention/format as configurable rather than hardcoded. Which specific frameworks (SOC2, HIPAA, etc.) to design against is still open (SE-3) until a target industry is clearer.
@@ -409,7 +411,7 @@ RMM/PSA platforms serving MSPs face their own well-documented frustrations — v
 - Open, auditable core vs. black-box automation — directly addresses the trust gap identified above
 - On-prem-first, not cloud-mandatory — a real gap left by WSUS's cloud-leaning replacement paths
 - Standardized module/workflow contracts as the actual product, not a proprietary scripting language locking users in
-- Gradual, earned autonomy as a stated design principle, not a marketing claim — matched by mandatory rollback paths and an auditable knowledge base (SAB-KB)
+- Gradual, earned autonomy as a stated design principle, not a marketing claim — matched by mandatory rollback paths and an auditable state store (Section 4.5)
 
 **Pitfalls to Avoid**
 - Don't chase full autonomy to compete on "AI-ness" — the research suggests this is precisely what erodes trust and stalls adoption elsewhere
@@ -467,6 +469,8 @@ The roadmap isn't just feature phases — it's also a trust/autonomy maturity la
   *(This is a proposed breakdown, not yet a locked decision — the AI agent layer's and connectors' placement in particular are reasonable defaults worth confirming rather than settled facts.)*
 - **Exit criteria:** enough architectural clarity (Sections 3–7) that starting to code wouldn't mean immediately contradicting the design
 
+**⚠️ Sequencing Note (resolves `open-questions.md` RC-5):** The phases below describe `sab-engine`'s own build path, but they are **not** necessarily what to work on next in real time. `sab-kb` — a separate product — already has working code (agents, connectors, a frontend), a resolved business model, and real market validation behind it, none of which `sab-engine` has yet. The honest read: **`sab-kb` should ship before `sab-engine`'s Phase 1**, not after. Treat `sab-engine`'s phases below as the roadmap for *this repo specifically*, and treat `sab-kb`'s own build-readiness docs (in the `temp` folder, pending migration) as the actual near-term priority for where build effort goes first.
+
 ### Phase 1: Windows Server Patching Proof of Concept
 *Prove the core architecture works end-to-end on the narrowest possible slice.*
 - Core orchestration engine: sequencing, state tracking, rollback triggering (Section 4.1) — minimum viable version
@@ -493,21 +497,22 @@ The roadmap isn't just feature phases — it's also a trust/autonomy maturity la
 
 ### Phase 4: Community, Open Source Launch, and Marketplace (Free Tier)
 *Open the doors.*
-- Public open source launch of the core engine and module library repos only — **`sab-kb` stays closed/commercial** (correction from an earlier draft of this doc, which had it as open source; see Section 4.5)
+- Public open source launch of `sab-engine` and `sab-modules` only — `sab-kb` and `sab-commercial` stay closed/commercial (see the repo breakdown in Phase 0)
 - ~~Migrate repos from personal GitHub ID to a dedicated organization~~ — **no longer needed**: the `sab-hq` organization is already claimed, so repos are created there directly from the start rather than migrated later
-- SAB Marketplace Phase 1 (free add-ons only, per Section 5.1) — discoverability layer for community-contributed modules/connectors/workflow packs
+- SAB Engine Marketplace Phase 1 (free add-ons only, per Section 5.1) — discoverability layer for community-contributed modules/connectors/workflow packs
 - Begin outreach on partnership angles identified in Section 6/8 (Microsoft, UiPath, Workato) now that there's a real, working project to point to rather than just a design document
 
 ### Later / Ongoing (Not Strictly Sequential)
 - Commercial layer: managed hosting, enterprise connectors, compliance/industry-specific workflow packs (business model, Section 1)
-- SAB Marketplace Phase 2 (paid listings, vetting/certification tiers — Section 5.1)
-- Gradual autonomy expansion for well-proven workflows (Section 4.3), tracked per-workflow via SAB-KB rather than as a single system-wide switch
+- SAB Engine Marketplace Phase 2 (paid listings, vetting/certification tiers — Section 5.1)
+- Gradual autonomy expansion for well-proven workflows (Section 4.3), tracked per-workflow via the Engine State Store rather than as a single system-wide switch
 - Ongoing security/compliance hardening (Section 7) as adoption grows and stakes rise
 
 **Immediate Next Steps**
-1. Resolve the highest-leverage open architecture questions before writing code — particularly AR-1 (engine service model) and TS-1/TS-2 (tech stack), since these affect almost everything built in Phase 1
-2. Create the four repos under `sab-hq` once ready (org already claimed; repo creation still intentionally deferred per your preference to finish designing first)
-3. ~~Draft the concrete technical spec for the WSUS-read connector (PO-4) as a first buildable artifact~~ — **done**, see `wsus-connector-spec.md` (a few sub-questions remain within it, to be resolved during implementation)
+1. **`sab-kb` build work takes priority over `sab-engine` Phase 1** — per the sequencing note above (RC-5). This is the realistic next step, not what follows.
+2. For `sab-engine` specifically, once attention returns to it: resolve the highest-leverage open architecture questions before writing code — particularly TS-1/TS-2 (tech stack), since these affect almost everything built in Phase 1
+3. ~~Create the four repos under `sab-hq`~~ — **done**, all four repos exist, are connected, and (except `sab-kb`, still pending its migration) have real content pushed
+4. ~~Draft the concrete technical spec for the WSUS-read connector (PO-4) as a first buildable artifact~~ — **done**, see `wsus-connector-spec.md` (a few sub-questions remain within it, to be resolved during implementation)
 
 > *(Further detail — target dates, resourcing, specific workflow prioritization within Phase 2 — to be added as they become clearer)*
 
