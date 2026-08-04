@@ -50,7 +50,7 @@
 
 ---
 
-## SAB-KB / SAB-Engine Reconciliation (new — see `temp` folder discovery)
+## SAB-KB / SAB-Engine Reconciliation (see `temp` folder discovery — migration now complete, `temp` deleted)
 
 | ID | Question | Status |
 |---|---|---|
