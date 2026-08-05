@@ -5,6 +5,7 @@ Core orchestration engine and AI agent layer for SAB — executes sysadmin workf
 
 Plain-language guides to the core concepts — no prior context needed:
 
+- [**What is SAB?**](docs/what-is-sab.md) — the short answer, start here
 - [**Workflows**](docs/workflows.md) — the recipe SAB follows to get a job done
 - [**Modules**](docs/modules.md) — the individual, reusable steps a workflow is built from
 - [**Recommend-and-approve mode**](docs/recommend-and-approve-mode.md) — why nothing runs against a real server without a human saying yes
