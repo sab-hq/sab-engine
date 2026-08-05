@@ -12,7 +12,9 @@ Plain-language guides to the core concepts — no prior context needed:
 - [**Recommend-and-approve mode**](docs/recommend-and-approve-mode.md) — why nothing runs against a real server without a human saying yes
 - [**Orchestration engine**](docs/orchestration-engine.md) — the piece that actually carries out an approved plan
 - [**Execution environment**](docs/execution-environment.md) — how SAB actually reaches a real server, on-prem or otherwise
-- [**Engine State Store**](docs/engine-state-store.md) — SAB's memory of past runs, so it isn't starting blind every time
+- [**Engine State Store (ESS)**](docs/engine-state-store.md) — SAB's memory of past runs, so it isn't starting blind every time
+- [**ESS vs. SAB-KB**](docs/ess-vs-sab-kb.md) — why SAB-KB isn't a paid upgrade of ESS, but covers a gap ESS can never reach
+- [**What is SAB-KB?**](docs/what-is-sab-kb.md) — a separate, paid SAB product, explained for anyone curious even though it's not part of this repo
 
 ## Want to contribute?
 

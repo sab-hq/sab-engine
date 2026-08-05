@@ -1,4 +1,4 @@
-# Engine State Store
+# Engine State Store (ESS)
 
 *A beginner's guide to what the Engine State Store is, and how it fits into the bigger picture.*
 
@@ -6,17 +6,17 @@
 
 ## In one sentence
 
-The **Engine State Store** is SAB's memory — the record of what's been run, against what, and with what result — so the AI agent, the orchestration engine, and the humans using SAB are all working from the same real history instead of starting fresh every time.
+The **Engine State Store (ESS)** is SAB's memory — the record of what's been run, against what, and with what result — so the AI agent, the orchestration engine, and the humans using SAB are all working from the same real history instead of starting fresh every time.
 
 ## The problem it solves
 
 Imagine SAB had no memory at all. Every single time you asked it to patch a server, the AI agent would be starting completely blind — no idea whether this exact workflow has run cleanly against similar servers a hundred times before, or whether it's caused problems in the past. You'd have to trust every single run equally, with no way to say "this one has a real track record behind it" versus "this one's never been tried before."
 
-That's a bad foundation for the kind of gradual, earned trust SAB is built around (see `recommend-and-approve-mode.md`). The Engine State Store exists specifically to give SAB real memory to work from, so trust can be based on an actual track record instead of a leap of faith every time.
+That's a bad foundation for the kind of gradual, earned trust SAB is built around (see `recommend-and-approve-mode.md`). The ESS exists specifically to give SAB real memory to work from, so trust can be based on an actual track record instead of a leap of faith every time.
 
 ## What it actually is
 
-The Engine State Store is where SAB's own history lives — everything that's happened during past workflow runs, kept in one place that different parts of the system can read from and write to.
+The Engine State Store (ESS, for short — that's the term you'll see used elsewhere in SAB's docs) is where SAB's own history lives — everything that's happened during past workflow runs, kept in one place that different parts of the system can read from and write to.
 
 **What it likely keeps track of:**
 - **Run history** — every workflow that's ever run: what was run, against which target, what happened, whether a rollback was needed
@@ -27,9 +27,9 @@ The Engine State Store is where SAB's own history lives — everything that's ha
 ## Where it fits in the bigger picture
 
 ```
-Orchestration engine runs a workflow   ← (orchestration-engine.md)
+The orchestration engine runs a workflow   ← (orchestration-engine.md)
       ↓
-The result gets written into the Engine State Store   ← (this is this document)
+The result gets written into the ESS   ← (this is this document)
       ↓
 Next time, the AI agent reads that history back out   ← (ai-agent-layer.md)
       ↓
@@ -40,9 +40,9 @@ This is the piece that closes the loop. Without it, every run would be a one-off
 
 ## A useful mental model
 
-**The Engine State Store is like a patient's medical chart.**
+**The Engine State Store (ESS) is like a patient's medical chart.**
 
-A doctor doesn't treat every visit as if they're meeting the patient for the first time — they check the chart first: what's been tried before, what worked, what didn't, any relevant history. That context changes the decision. The Engine State Store plays the same role for SAB: before the AI agent proposes anything, it can check "what happened the last several times this workflow ran against this server, or one like it" — and that real history shapes a better, more specific proposal than starting from zero every time.
+A doctor doesn't treat every visit as if they're meeting the patient for the first time — they check the chart first: what's been tried before, what worked, what didn't, any relevant history. That context changes the decision. The ESS plays the same role for SAB: before the AI agent proposes anything, it can check "what happened the last several times this workflow ran against this server, or one like it" — and that real history shapes a better, more specific proposal than starting from zero every time.
 
 ## Why this design choice matters (not just how it works)
 

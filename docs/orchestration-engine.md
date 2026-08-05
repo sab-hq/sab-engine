@@ -29,7 +29,7 @@ Using the Windows Server patching workflow as the example again, here's what the
 3. **It runs `apply-patches`**, tracking that this specific module is now "in progress" for this specific server.
 4. **It runs `validate`** to confirm the server came back up correctly.
 5. **If any step along the way fails**, the engine automatically triggers that module's rollback procedure — nobody has to notice the failure and manually kick off an undo. This happens as part of the engine's job, not as a separate manual process.
-6. **Once everything's done (success or failure)**, it writes down exactly what happened — every step, every result — so there's a real record afterward (see Section 4.5 of the design doc for where that record lives).
+6. **Once everything's done (success or failure)**, it writes down exactly what happened — every step, every result — so there's a real record afterward (see `engine-state-store.md` — the Engine State Store, or ESS — for where that record lives).
 
 ## Where it fits in the bigger picture
 

@@ -10,7 +10,7 @@
 
 ## Changelog
 
-- **v0.1.2** (Aug 4, 2026) — Added RMM/PSA/MCP connector research to Section 6 (specific integration priorities: NinjaOne, ConnectWise Manage, Autotask PSA, Ansible Automation Platform/AWX, Hudu, plus partner-program notes and a phased rollout) and to Section 8 (2026 MCP ecosystem findings, including documented security risks that reinforce the recommend-and-approve principle). Also closed out most remaining "to be filled in" placeholders across Sections 2–9 with concrete first-draft detail (state machine, module metadata schema, connector interface, Engine State Store data model, API surface) — items that genuinely need Brock's input (revenue share %, compliance framework target, target dates) are explicitly flagged rather than invented, and collected in Section 10. Reformatted headers throughout so the label and its following text are visually separated, not run together. Confirmed Docker containers as the module sandboxing mechanism (SE-2). Confirmed every module and every workflow requires a unique ID (new AR-5); reflected in Sections 3 and 4.2. Confirmed "Open Source Module Library (OSML)" as the official name for the module library / `sab-hq/sab-modules` repo (new AR-6); reflected in Sections 4.2, 5.1, and 9.
+- **v0.1.2** (Aug 4, 2026) — Added RMM/PSA/MCP connector research to Section 6 (specific integration priorities: NinjaOne, ConnectWise Manage, Autotask PSA, Ansible Automation Platform/AWX, Hudu, plus partner-program notes and a phased rollout) and to Section 8 (2026 MCP ecosystem findings, including documented security risks that reinforce the recommend-and-approve principle). Also closed out most remaining "to be filled in" placeholders across Sections 2–9 with concrete first-draft detail (state machine, module metadata schema, connector interface, Engine State Store data model, API surface) — items that genuinely need Brock's input (revenue share %, compliance framework target, target dates) are explicitly flagged rather than invented, and collected in Section 10. Reformatted headers throughout so the label and its following text are visually separated, not run together. Confirmed Docker containers as the module sandboxing mechanism (SE-2). Confirmed every module and every workflow requires a unique ID (new AR-5); reflected in Sections 3 and 4.2. Confirmed "Open Source Module Library (OSML)" as the official name for the module library / `sab-hq/sab-modules` repo (new AR-6); reflected in Sections 4.2, 5.1, and 9. Confirmed "ESS" as the official shorthand for the Engine State Store (new AR-7); reflected in Section 4.5. Added a full set of plain-language companion docs (`what-is-sab.md` through `open-source-module-library.md`) and cross-linked them throughout this document.
 - **v0.1.1** (Aug 2, 2026) — Full document buildout: Executive Summary, workflow/module architecture, all of Section 4 including the new Engine State Store (4.5), Marketplace (5.1), Integration (6), Security (7), Existing Solutions (8), and the Phase 0–4 roadmap (9). Tech stack, licensing, and repo structure confirmed via `open-questions.md`.
 - **v0.1.0** — Initial document. Section 2 (System Requirements and Goals) established as the founding principle; all other sections were placeholders.
 
@@ -26,7 +26,7 @@
    - 4.2 Module Library System (OSML)
    - 4.3 AI Agent Layer
    - 4.4 Execution Environment
-   - 4.5 Engine State Store *(renamed from "Shared Knowledge Base (SAB-KB)" — see RC-3)*
+   - 4.5 Engine State Store (ESS) *(renamed from "Shared Knowledge Base (SAB-KB)" — see RC-3)*
 5. [Extensibility and Plugin System](#5-extensibility-and-plugin-system)
    - 5.1 SAB Engine Marketplace *(renamed from "SAB Marketplace" — see RC-3)*
 6. [Integration with Existing Enterprise Tools](#6-integration-with-existing-enterprise-tools)
@@ -50,7 +50,9 @@ Each core concept in this document also has a plain-language companion doc, writ
 | [`recommend-and-approve-mode.md`](recommend-and-approve-mode.md) | Section 2 — the human approval gate |
 | [`orchestration-engine.md`](orchestration-engine.md) | Section 4.1 — what actually runs an approved plan |
 | [`execution-environment.md`](execution-environment.md) | Section 4.4 — how SAB reaches a real server |
-| [`engine-state-store.md`](engine-state-store.md) | Section 4.5 — SAB's memory of past runs |
+| [`engine-state-store.md`](engine-state-store.md) | Section 4.5 — SAB's memory of past runs (ESS) |
+| [`ess-vs-sab-kb.md`](ess-vs-sab-kb.md) | Section 4.5 / `open-questions.md` RC-1–RC-3 — why SAB-KB covers a gap ESS structurally can't reach, not a "bigger" version of it |
+| [`what-is-sab-kb.md`](what-is-sab-kb.md) | Section 1 — what the separate, paid SAB-KB product actually is |
 | [`community-contribution-framework.md`](community-contribution-framework.md) | Section 5 — how anyone can contribute |
 | [`open-source-module-library.md`](open-source-module-library.md) | Section 4.2/9 — the OSML, where modules and workflows actually live |
 
@@ -348,13 +350,13 @@ health_check(target) -> bool
 
 > *(Further detail — exact timeout/retry policy, how `ExecutionResult` structures partial-failure information for the rollback path — to be added once the WinRM connector is actually implemented, Section 9 Phase 1)*
 
-### 4.5 Engine State Store
-*(Renamed from "Shared Knowledge Base (SAB-KB)" — see `open-questions.md` RC-3. The name "SAB-KB" now belongs exclusively to the separate `sab-kb` commercial product; this component keeps `sab-engine`'s original narrow scope under a name that doesn't collide.)*
+### 4.5 Engine State Store (ESS)
+*(Renamed from "Shared Knowledge Base (SAB-KB)" — see `open-questions.md` RC-3. "ESS" is the official shorthand, per `open-questions.md` AR-7. The name "SAB-KB" now belongs exclusively to the separate `sab-kb` commercial product; this component keeps `sab-engine`'s original narrow scope under a name that doesn't collide.)*
 - What is the Engine State Store and why does it exist as its own component?
 - What information lives there, and who/what reads and writes it?
 - How does it relate to the other components?
 
-> 📖 Plain-language companion: [`engine-state-store.md`](engine-state-store.md)
+> 📖 Plain-language companions: [`engine-state-store.md`](engine-state-store.md), [`ess-vs-sab-kb.md`](ess-vs-sab-kb.md)
 
 **Resolution (see `open-questions.md` RC-1, RC-2):** `sab-engine` and `sab-kb` are independent products for now, with no assumed integration. `sab-engine` gets its own small internal store — described below — scoped only to what the orchestration engine and AI agent need (run history, target state). Whether `sab-engine`'s AI agent ever queries `sab-kb` for broader context is a real future question, deliberately left open rather than assumed, since `sab-engine` isn't being built yet (see RC-5 below).
 

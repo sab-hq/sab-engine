@@ -21,7 +21,7 @@ The AI agent is the "what and why" layer of SAB — it doesn't execute anything 
 **What it looks at before proposing anything:**
 - The workflow you picked (the recipe itself)
 - The current state of the actual target system — patch level, last patch date, anything unusual going on
-- Real history — has this workflow run against this server (or similar servers) before, and how did that go? (This comes from SAB's memory — see Section 4.5 of the design doc.)
+- Real history — has this workflow run against this server (or similar servers) before, and how did that go? (This comes from SAB's memory — the Engine State Store, or ESS — see `engine-state-store.md`.)
 - Constraints — maintenance windows, blackout periods, anything else that matters
 
 **What it hands back:**
@@ -55,7 +55,7 @@ A resident can be genuinely skilled — good at reading the chart, spotting some
 
 - **The agent can never call a module directly.** This is a hard boundary built into the architecture, not a policy someone has to remember to follow. No matter what the agent decides, the most it can ever do is put a proposal in front of a human — it structurally cannot skip straight to action.
 - **Its plan is a real, structured object — not just a paragraph of text.** This matters because it's what lets the orchestration engine double-check the plan automatically (does every proposed module actually have a tested rollback path? Section 4.1/4.2's rule) before a human even sees it, and it's what makes a human's "approve" click mean something specific and inspectable, not a leap of faith.
-- **It gets smarter about a specific server over time, based on real history — not vibes.** Because it can look at SAB's memory of past runs (Section 4.5), a workflow that's run cleanly against a class of server forty times shows up differently than one being tried somewhere completely new. That's real earned context, not guesswork.
+- **It gets smarter about a specific server over time, based on real history — not vibes.** Because it can look at the ESS (`engine-state-store.md`), a workflow that's run cleanly against a class of server forty times shows up differently than one being tried somewhere completely new. That's real earned context, not guesswork.
 
 ## Getting familiar with the AI agent layer — where to look next
 
