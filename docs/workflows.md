@@ -24,6 +24,8 @@ That mental checklist is real, valuable knowledge — but it usually lives only 
 
 A workflow is the *recipe*. It doesn't do any of the actual work itself — it's an ordered list that says "run this step, then this step, then this step," where each step is a **module** (see `modules.md` for the full picture on those). Think of it like a recipe card: the recipe doesn't chop the vegetables or preheat the oven, it just tells you the order to do those things in.
 
+Just like modules, **every workflow has its own unique ID** — no two workflows share one, even if their names sound similar. That's what lets SAB reliably say "run *this exact recipe*" whether the trigger is a person clicking a button, a schedule, or an external system (see Section 6 of the design doc) — there's never any ambiguity about which recipe was actually meant.
+
 For SAB's first real workflow — patching a Windows Server — the recipe looks roughly like this:
 
 ```

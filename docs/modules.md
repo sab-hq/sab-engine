@@ -20,13 +20,14 @@ A module is one specific, well-defined action — deliberately "dumb" in the sen
 
 Every module, regardless of what it does, is required to have the same basic parts:
 
+- **A unique ID** — no two modules, ever, share the same ID. This is what lets a workflow say "run *this exact module*" without any ambiguity, even if two different modules happen to have very similar names.
 - **A name and description** — what it is, in plain terms
 - **Inputs** — what information it needs to do its job (e.g. "which patches to apply")
 - **Outputs** — what it reports back when it's done (e.g. "succeeded" or "failed," plus any relevant details)
 - **A rollback procedure** — a tested way to *undo* what it did, if something later goes wrong
 - **Tests** — proof that it actually works, ideally checked in a safe lab environment before it's ever trusted against a real production server
 
-That **rollback procedure** requirement is the one non-negotiable part. If a module can't be safely undone, it's not allowed to be part of a workflow that touches production — full stop. This is SAB's core promise, and it's enforced automatically rather than left to a human to remember (see Section 2 of `SAB_Design_Document_v0.1.2.md`).
+That **rollback procedure** requirement is the one non-negotiable part when it comes to safety. The **unique ID** requirement is the one non-negotiable part when it comes to just being able to find and trust the right module in the first place — without it, there'd be no reliable way for a workflow, the AI agent, or the orchestration engine to say "I mean *that specific module*, not something that merely looks like it." If a module can't be safely undone, it's not allowed to be part of a workflow that touches production — full stop. This is SAB's core promise, and it's enforced automatically rather than left to a human to remember (see Section 2 of `SAB_Design_Document_v0.1.2.md`).
 
 ## A concrete example
 

@@ -10,7 +10,7 @@
 
 ## Changelog
 
-- **v0.1.2** (Aug 4, 2026) — Added RMM/PSA/MCP connector research to Section 6 (specific integration priorities: NinjaOne, ConnectWise Manage, Autotask PSA, Ansible Automation Platform/AWX, Hudu, plus partner-program notes and a phased rollout) and to Section 8 (2026 MCP ecosystem findings, including documented security risks that reinforce the recommend-and-approve principle). Also closed out most remaining "to be filled in" placeholders across Sections 2–9 with concrete first-draft detail (state machine, module metadata schema, connector interface, Engine State Store data model, API surface) — items that genuinely need Brock's input (revenue share %, compliance framework target, target dates) are explicitly flagged rather than invented, and collected in Section 10. Reformatted headers throughout so the label and its following text are visually separated, not run together.
+- **v0.1.2** (Aug 4, 2026) — Added RMM/PSA/MCP connector research to Section 6 (specific integration priorities: NinjaOne, ConnectWise Manage, Autotask PSA, Ansible Automation Platform/AWX, Hudu, plus partner-program notes and a phased rollout) and to Section 8 (2026 MCP ecosystem findings, including documented security risks that reinforce the recommend-and-approve principle). Also closed out most remaining "to be filled in" placeholders across Sections 2–9 with concrete first-draft detail (state machine, module metadata schema, connector interface, Engine State Store data model, API surface) — items that genuinely need Brock's input (revenue share %, compliance framework target, target dates) are explicitly flagged rather than invented, and collected in Section 10. Reformatted headers throughout so the label and its following text are visually separated, not run together. Confirmed Docker containers as the module sandboxing mechanism (SE-2). Confirmed every module and every workflow requires a unique ID (new AR-5); reflected in Sections 3 and 4.2.
 - **v0.1.1** (Aug 2, 2026) — Full document buildout: Executive Summary, workflow/module architecture, all of Section 4 including the new Engine State Store (4.5), Marketplace (5.1), Integration (6), Security (7), Existing Solutions (8), and the Phase 0–4 roadmap (9). Tech stack, licensing, and repo structure confirmed via `open-questions.md`.
 - **v0.1.0** — Initial document. Section 2 (System Requirements and Goals) established as the founding principle; all other sections were placeholders.
 
@@ -100,6 +100,7 @@ The system must be solid and predictable before it is trusted to act autonomousl
 
 - A **module** is a single reusable unit of work (e.g. `check-patch-status`, `apply-patch`). Modules are "dumb" and reliable — they do one job, don't make decisions, and don't know about the bigger picture.
 - A **workflow** is the ordered recipe that strings modules together to accomplish a real-world use case (e.g. "patch this server" = pre-flight check → stage → apply → validate → rollback-if-needed). Workflows capture the process an SA/SE would normally walk through manually.
+- **Every module and every workflow has its own unique ID** (see `open-questions.md`, AR-5, confirmed) — this is how they're referenced unambiguously throughout the rest of the system; see Section 4.2 for the full detail.
 
 **End-to-End Flow**
 
@@ -187,6 +188,7 @@ The module library is where the actual work lives — it's the "do the work" lay
 **The Module Contract**
 
 For the orchestration engine to call any module interchangeably, every module needs to follow the same standard shape, regardless of what it actually does or what language it's written in underneath (PowerShell to start, Bash/IaC later). At minimum, each module needs:
+- **A unique ID** — required, not optional (see `open-questions.md`, AR-5, confirmed). This is how the orchestration engine, the AI agent, workflow definitions, and eventually the Marketplace all refer to this exact module without ambiguity — no two modules, from any source, can share one.
 - **Metadata** — name, description, version, risk level, what environment(s) it supports
 - **Inputs** — a defined, typed set of parameters it expects
 - **Outputs** — a defined, typed result (success/failure + relevant data)
@@ -203,6 +205,8 @@ Modules need to be discoverable — by the AI agent (to know what's available to
 **Workflows as a separate layer**
 
 Workflows (recipes) reference modules by their contract, not their implementation — so a workflow definition says "run the module tagged `pre-flight-check` for this environment," and the library resolves which actual module that maps to. This keeps workflows portable across environments as long as an equivalent module exists.
+
+Like modules, **every workflow also has its own unique ID** (see `open-questions.md`, AR-5, confirmed) — this is what a `WorkflowRun` (Section 4.1) actually points to when it records which recipe it followed, and what lets the same workflow be triggered reliably by a schedule, a human, or an external system (Section 6's MCP findings) without ambiguity about which recipe is meant.
 
 **Community contribution implications**
 

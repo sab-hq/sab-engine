@@ -36,7 +36,7 @@
 - **Phase 1 constraint: recommend-and-approve only.** No autonomy stretch goals at launch — every plan requires human approval before the engine executes it. This is a hard architectural boundary, not just a policy: the agent produces proposals, it does not call modules directly.
 
 ### 3. Module Contract & Connector Contract (Sections 4.2, 4.4)
-- The interface definitions that `sab-modules` builds against — metadata schema, typed inputs/outputs, required rollback procedure, test requirements
+- The interface definitions that `sab-modules` builds against — a required unique ID (AR-5, confirmed — no two modules or workflows ever share one), metadata schema, typed inputs/outputs, required rollback procedure, test requirements
 - The connector interface that execution environments implement
 - These contracts are the actual product surface for extensibility (Section 5) — worth treating interface stability here as a first-class design concern, since `sab-modules` and eventually third-party integrations all depend on them not shifting underneath them
 
