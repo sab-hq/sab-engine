@@ -21,6 +21,10 @@ Plain-language guides to the core concepts — no prior context needed:
 - [**Community contribution framework**](docs/community-contribution-framework.md) — how anyone can build a module or connector for SAB, and how it gets trusted
 - [**Open Source Module Library (OSML)**](docs/open-source-module-library.md) — where every module and workflow actually lives, and how it fits alongside `sab-engine`
 
+## Before development starts
+
+- [**Pre-development checklist**](docs/pre-development-checklist.md) — living tracker of what's left to do before writing code, with unique IDs and status
+
 ## Deeper reference
 
 - [**Design document**](docs/SAB_Design_Document_v0.1.2.md) — the full technical architecture and design decisions
