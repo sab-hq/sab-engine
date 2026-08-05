@@ -1,4 +1,4 @@
-# Engine State Store
+# Engine State Store (ESS)
 
 *A beginner's guide to what the Engine State Store is, and how it fits into the bigger picture.*
 
