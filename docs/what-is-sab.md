@@ -22,10 +22,12 @@ SAB is built out of a small number of core ideas that fit together. Here's the s
 
 - **[Workflows](workflows.md)** — a workflow is the "recipe" for getting a specific job done, like patching a Windows Server. It's an ordered list of steps, written once and reused every time that job needs doing again.
 - **[Modules](modules.md)** — a module is one individual step in that recipe — one small, reliable, well-tested action, like "check if the server is healthy" or "apply the patches." Every module comes with a required, tested way to undo itself if something goes wrong.
+- **[The AI agent layer](ai-agent-layer.md)** — looks at the specific situation and proposes exactly which modules to run, in what order, and why — but it never acts on its own.
 - **[Recommend-and-approve mode](recommend-and-approve-mode.md)** — SAB's AI agent never just acts on its own. It looks at the situation, proposes a plan, and explains its reasoning — but a human has to approve that plan before anything actually happens to a real server.
 - **[The orchestration engine](orchestration-engine.md)** — once a plan is approved, this is the part of SAB that actually carries it out: running each module in the right order, tracking exactly what's happening, and automatically rolling back if something fails partway through.
+- **[The execution environment](execution-environment.md)** — the piece that actually reaches out and touches a real server, so nothing else in SAB has to know or care whether that server is on-prem, in the cloud, or somewhere in between.
 
-Put together, a typical SAB interaction looks like this: you pick a workflow → the AI agent proposes a specific plan for your situation → you approve it → the orchestration engine runs the plan, module by module → if anything fails, it rolls back automatically → what happened gets remembered for next time.
+Put together, a typical SAB interaction looks like this: you pick a workflow → the AI agent proposes a specific plan for your situation → you approve it → the orchestration engine runs the plan, module by module, reaching real servers through the execution environment → if anything fails, it rolls back automatically → what happened gets remembered for next time.
 
 ## Why it's built this way
 
@@ -47,8 +49,9 @@ SAB is being built with two related but distinct audiences in mind:
 ## Where to go next
 
 - New to all of this? Read **[Workflows](workflows.md)** first, then **[Modules](modules.md)** — those two ideas are the foundation everything else builds on.
+- Curious about how the AI actually decides what to propose? **[The AI agent layer](ai-agent-layer.md)** covers that.
 - Curious about the safety model specifically? **[Recommend-and-approve mode](recommend-and-approve-mode.md)** is the one to read.
-- Want to know what actually runs the show behind the scenes? **[The orchestration engine](orchestration-engine.md)** covers that.
+- Want to know what actually runs the show behind the scenes? **[The orchestration engine](orchestration-engine.md)** covers that, and **[the execution environment](execution-environment.md)** covers how it actually reaches a real server.
 - Ready for the full technical picture, not just the plain-language version? Everything here traces back to **`SAB_Design_Document_v0.1.2.md`**, which is the authoritative source if anything in these beginner docs ever seems to disagree.
 
 ---

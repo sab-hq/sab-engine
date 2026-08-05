@@ -8,8 +8,10 @@ Plain-language guides to the core concepts — no prior context needed:
 - [**What is SAB?**](docs/what-is-sab.md) — the short answer, start here
 - [**Workflows**](docs/workflows.md) — the recipe SAB follows to get a job done
 - [**Modules**](docs/modules.md) — the individual, reusable steps a workflow is built from
+- [**AI agent layer**](docs/ai-agent-layer.md) — how SAB decides what to propose, and why
 - [**Recommend-and-approve mode**](docs/recommend-and-approve-mode.md) — why nothing runs against a real server without a human saying yes
 - [**Orchestration engine**](docs/orchestration-engine.md) — the piece that actually carries out an approved plan
+- [**Execution environment**](docs/execution-environment.md) — how SAB actually reaches a real server, on-prem or otherwise
 
 ## Deeper reference
 
