@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    SabEngine.Execution — execution environment connectors. See
+    docs/SAB_Design_Document_v0.1.2.md, Section 4.4, and
+    execution-environment.md for the plain-language version.
+
+    The WinRM connector (the first real implementation of
+    SabEngine.Core.IExecutionConnector) is pre-development-checklist.md
+    PD-17 through PD-20 — not added yet.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\SabEngine.Core\SabEngine.Core.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    SabEngine.Orchestration — the orchestration engine itself: sequencing,
+    state tracking, rollback triggering. See docs/SAB_Design_Document_v0.1.2.md,
+    Section 4.1, and orchestration-engine.md for the plain-language version.
+
+    The state machine and concurrency implementation are
+    pre-development-checklist.md PD-4 and PD-5.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\SabEngine.Core\SabEngine.Core.csproj" />
+    <ProjectReference Include="..\SabEngine.Data\SabEngine.Data.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    SabEngine.Api — the CLI/API entry point (design doc, Section 4.1,
+    "CLI/API to trigger and monitor workflows"). This is the composition
+    root: the only project allowed to reference all four of the others.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SabEngine.Core\SabEngine.Core.csproj" />
+    <ProjectReference Include="..\SabEngine.Data\SabEngine.Data.csproj" />
+    <ProjectReference Include="..\SabEngine.Orchestration\SabEngine.Orchestration.csproj" />
+    <ProjectReference Include="..\SabEngine.Agent\SabEngine.Agent.csproj" />
+    <ProjectReference Include="..\SabEngine.Execution\SabEngine.Execution.csproj" />
+  </ItemGroup>
+</Project>

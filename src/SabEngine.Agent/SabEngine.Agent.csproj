@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    SabEngine.Agent — the AI agent layer. See docs/SAB_Design_Document_v0.1.2.md,
+    Section 4.3, and ai-agent-layer.md for the plain-language version.
+
+    Microsoft Semantic Kernel integration (TS-2, confirmed) is
+    pre-development-checklist.md PD-6 — the package reference and actual
+    plan-drafting logic aren't added yet, so this scaffolding step stays
+    buildable on its own.
+
+    Hard boundary (Section 4.3): this project can only ever produce a
+    proposed Plan. It must never reference SabEngine.Execution or call a
+    module directly — that boundary is what keeps recommend-and-approve
+    enforceable at the architecture level, not just a policy.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\SabEngine.Core\SabEngine.Core.csproj" />
+  </ItemGroup>
+</Project>

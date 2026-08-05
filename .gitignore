@@ -1,0 +1,24 @@
+# Build results
+bin/
+obj/
+out/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Test results
+TestResults/
+*.trx
+
+# NuGet
+*.nupkg
+.nuget/
+
+# User-specific secrets (never commit real credentials — see docs/SAB_Design_Document_v0.1.2.md Section 7)
+appsettings.Development.json
+appsettings.Local.json
+.env

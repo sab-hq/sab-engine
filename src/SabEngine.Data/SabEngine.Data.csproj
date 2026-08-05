@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    SabEngine.Data — persistence layer for the Engine State Store (ESS).
+    See docs/SAB_Design_Document_v0.1.2.md, Section 4.5, and
+    engine-state-store.md for the plain-language version.
+
+    PostgreSQL is the confirmed backend (TS-3). EF Core + Npgsql package
+    references, the DbContext, and the actual schema implementation are
+    PD-3 in pre-development-checklist.md — intentionally not added yet,
+    so this scaffolding step stays buildable on its own.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\SabEngine.Core\SabEngine.Core.csproj" />
+  </ItemGroup>
+</Project>

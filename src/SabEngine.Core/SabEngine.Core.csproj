@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    SabEngine.Core — domain models and contracts. No dependencies on any
+    other project in this solution, and no external package dependencies.
+    Everything else (Orchestration, Agent, Execution, Data, Api) depends
+    on this project, never the other way around.
+  -->
+</Project>
