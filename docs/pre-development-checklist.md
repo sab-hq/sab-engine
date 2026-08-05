@@ -16,7 +16,7 @@
 
 | ID | Item | Why it's here / depends on | Status |
 |---|---|---|---|
-| PD-1 | Decide: does `sab-engine` build work start now, or does `sab-kb` still take priority per the Section 9 sequencing note (`open-questions.md` RC-5)? | Nothing below can meaningfully start until this is answered | ⬜ Not Started |
+| PD-1 | Decide: does `sab-engine` build work start now, or does `sab-kb` still take priority per the Section 9 sequencing note (`open-questions.md` RC-5)? | Nothing below can meaningfully start until this is answered | ✅ Done — **both, in parallel, confirmed by Brock.** Not strict sequencing after all; this actually matches RC-5's own resolution ("'both' is the actual working mode, not strict sequencing") rather than overriding it. PD-2 onward can proceed. |
 | PD-2 | Scaffold the `sab-engine` C#/.NET solution structure (per TS-1, confirmed) | The base project everything else gets built inside | ⬜ Not Started |
 | PD-3 | Stand up PostgreSQL and implement the Section 4.1/4.5 schema — `workflow_runs`, `plans`, `approvals`, `execution_results`, `target_state`, `notes`, `AuditEntry` (per TS-3, confirmed) | The orchestration engine is stateless by design (AR-1) — this has to exist before the engine has anywhere to persist state | ⬜ Not Started |
 | PD-4 | Implement the orchestration engine's state machine (`Requested → PlanDrafted → PendingApproval → Approved/Declined → Executing → Completed/Failed → RolledBack`, Section 4.1) | Depends on PD-2/PD-3 existing to persist against | ⬜ Not Started |
