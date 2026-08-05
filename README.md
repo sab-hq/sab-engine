@@ -12,6 +12,12 @@ Plain-language guides to the core concepts — no prior context needed:
 - [**Recommend-and-approve mode**](docs/recommend-and-approve-mode.md) — why nothing runs against a real server without a human saying yes
 - [**Orchestration engine**](docs/orchestration-engine.md) — the piece that actually carries out an approved plan
 - [**Execution environment**](docs/execution-environment.md) — how SAB actually reaches a real server, on-prem or otherwise
+- [**Engine State Store**](docs/engine-state-store.md) — SAB's memory of past runs, so it isn't starting blind every time
+
+## Want to contribute?
+
+- [**Community contribution framework**](docs/community-contribution-framework.md) — how anyone can build a module or connector for SAB, and how it gets trusted
+- [**Open Source Module Library (OSML)**](docs/open-source-module-library.md) — where every module and workflow actually lives, and how it fits alongside `sab-engine`
 
 ## Deeper reference
 

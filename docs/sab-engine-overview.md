@@ -50,7 +50,7 @@
 
 ## What Does *Not* Live Here
 
-- **Modules and workflow definitions themselves** — those live in `sab-modules`, referenced by contract
+- **Modules and workflow definitions themselves** — those live in `sab-modules`, the Open Source Module Library (OSML), referenced by contract
 - **SAB-KB's schema and query implementation** — lives in `sab-kb`; this repo is a *consumer* of that interface, not where it's implemented
 - **Marketplace, managed hosting, enterprise connectors** — all `sab-commercial`
 

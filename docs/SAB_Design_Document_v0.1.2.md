@@ -10,7 +10,7 @@
 
 ## Changelog
 
-- **v0.1.2** (Aug 4, 2026) — Added RMM/PSA/MCP connector research to Section 6 (specific integration priorities: NinjaOne, ConnectWise Manage, Autotask PSA, Ansible Automation Platform/AWX, Hudu, plus partner-program notes and a phased rollout) and to Section 8 (2026 MCP ecosystem findings, including documented security risks that reinforce the recommend-and-approve principle). Also closed out most remaining "to be filled in" placeholders across Sections 2–9 with concrete first-draft detail (state machine, module metadata schema, connector interface, Engine State Store data model, API surface) — items that genuinely need Brock's input (revenue share %, compliance framework target, target dates) are explicitly flagged rather than invented, and collected in Section 10. Reformatted headers throughout so the label and its following text are visually separated, not run together. Confirmed Docker containers as the module sandboxing mechanism (SE-2). Confirmed every module and every workflow requires a unique ID (new AR-5); reflected in Sections 3 and 4.2.
+- **v0.1.2** (Aug 4, 2026) — Added RMM/PSA/MCP connector research to Section 6 (specific integration priorities: NinjaOne, ConnectWise Manage, Autotask PSA, Ansible Automation Platform/AWX, Hudu, plus partner-program notes and a phased rollout) and to Section 8 (2026 MCP ecosystem findings, including documented security risks that reinforce the recommend-and-approve principle). Also closed out most remaining "to be filled in" placeholders across Sections 2–9 with concrete first-draft detail (state machine, module metadata schema, connector interface, Engine State Store data model, API surface) — items that genuinely need Brock's input (revenue share %, compliance framework target, target dates) are explicitly flagged rather than invented, and collected in Section 10. Reformatted headers throughout so the label and its following text are visually separated, not run together. Confirmed Docker containers as the module sandboxing mechanism (SE-2). Confirmed every module and every workflow requires a unique ID (new AR-5); reflected in Sections 3 and 4.2. Confirmed "Open Source Module Library (OSML)" as the official name for the module library / `sab-hq/sab-modules` repo (new AR-6); reflected in Sections 4.2, 5.1, and 9.
 - **v0.1.1** (Aug 2, 2026) — Full document buildout: Executive Summary, workflow/module architecture, all of Section 4 including the new Engine State Store (4.5), Marketplace (5.1), Integration (6), Security (7), Existing Solutions (8), and the Phase 0–4 roadmap (9). Tech stack, licensing, and repo structure confirmed via `open-questions.md`.
 - **v0.1.0** — Initial document. Section 2 (System Requirements and Goals) established as the founding principle; all other sections were placeholders.
 
@@ -23,7 +23,7 @@
 3. [Core Architecture Overview](#3-core-architecture-overview)
 4. [Component Breakdown](#4-component-breakdown)
    - 4.1 Orchestration Engine
-   - 4.2 Module Library System
+   - 4.2 Module Library System (OSML)
    - 4.3 AI Agent Layer
    - 4.4 Execution Environment
    - 4.5 Engine State Store *(renamed from "Shared Knowledge Base (SAB-KB)" — see RC-3)*
@@ -34,6 +34,25 @@
 8. [Existing Solutions and Learnings](#8-existing-solutions-and-learnings)
 9. [Development Roadmap and Next Steps](#9-development-roadmap-and-next-steps)
 10. [Open Questions and Future Considerations](#10-open-questions-and-future-considerations)
+
+---
+
+## Companion Beginner Documentation
+
+Each core concept in this document also has a plain-language companion doc, written for beginners and cross-linked to each other — useful for onboarding new contributors or anyone who wants the short version before the technical one. If anything in these ever disagrees with this document, this document wins.
+
+| Doc | Covers |
+|---|---|
+| [`what-is-sab.md`](what-is-sab.md) | The overall elevator pitch — start here |
+| [`workflows.md`](workflows.md) | Section 3/4.2 — the recipe concept |
+| [`modules.md`](modules.md) | Section 4.2 — the individual step/building-block concept |
+| [`ai-agent-layer.md`](ai-agent-layer.md) | Section 4.3 — how SAB decides what to propose |
+| [`recommend-and-approve-mode.md`](recommend-and-approve-mode.md) | Section 2 — the human approval gate |
+| [`orchestration-engine.md`](orchestration-engine.md) | Section 4.1 — what actually runs an approved plan |
+| [`execution-environment.md`](execution-environment.md) | Section 4.4 — how SAB reaches a real server |
+| [`engine-state-store.md`](engine-state-store.md) | Section 4.5 — SAB's memory of past runs |
+| [`community-contribution-framework.md`](community-contribution-framework.md) | Section 5 — how anyone can contribute |
+| [`open-source-module-library.md`](open-source-module-library.md) | Section 4.2/9 — the OSML, where modules and workflows actually live |
 
 ---
 
@@ -79,6 +98,8 @@ The first proof of concept is Windows Server patching on-premises — chosen bec
 ## 2. System Requirements and Goals
 *What must the system do? What are the non-negotiable requirements versus stretch goals?*
 
+> 📖 Plain-language companion: [`recommend-and-approve-mode.md`](recommend-and-approve-mode.md)
+
 **Core Design Principle: Reliability and Gradual Autonomy**
 
 The system must be solid and predictable before it is trusted to act autonomously. This is non-negotiable given the system touches production infrastructure. Implications:
@@ -95,6 +116,8 @@ The system must be solid and predictable before it is trusted to act autonomousl
 
 ## 3. Core Architecture Overview
 *How all the pieces fit together at a 30,000-foot level — data flow, component relationships, overall design philosophy.*
+
+> 📖 Plain-language companions: [`what-is-sab.md`](what-is-sab.md), [`workflows.md`](workflows.md), [`modules.md`](modules.md)
 
 **Key Concept: Workflow vs. Module**
 
@@ -140,6 +163,8 @@ Each layer has one job and doesn't reach into another layer's responsibility:
 - How does it manage state and execution flow?
 - What are the inputs and outputs?
 
+> 📖 Plain-language companion: [`orchestration-engine.md`](orchestration-engine.md)
+
 **Role in the System**
 
 The orchestration engine is the "how and when" layer (see Section 3). It doesn't decide *what* to do — that's the AI agent's job — it takes an approved plan and reliably carries it out.
@@ -174,8 +199,11 @@ This is what makes "what's currently pending my approval" a simple query rather 
 
 > *(Further detail — exact locking/claim mechanism, worker health/timeout handling — to be added once Phase 1 implementation starts)*
 
-### 4.2 Module Library System
-*See Section 3 for the foundational workflow-vs-module distinction: modules are atomic, reusable units of work; workflows are the recipes that string modules together for a specific use case.*
+### 4.2 Module Library System (OSML)
+*See Section 3 for the foundational workflow-vs-module distinction: modules are atomic, reusable units of work; workflows are the recipes that string modules together for a specific use case. This system — conceptually and as the actual `sab-hq/sab-modules` repository — is officially named the **Open Source Module Library (OSML)**, per `open-questions.md` AR-6.*
+
+> 📖 Plain-language companions: [`modules.md`](modules.md), [`workflows.md`](workflows.md), [`open-source-module-library.md`](open-source-module-library.md)
+
 - How are reusable components structured and catalogued?
 - How do modules interact with the orchestration engine?
 - Standards and conventions for building modules?
@@ -245,6 +273,8 @@ tests:
 - How do they interact with the orchestration engine?
 - What information do they need to operate effectively?
 
+> 📖 Plain-language companion: [`ai-agent-layer.md`](ai-agent-layer.md)
+
 **Role in the System**
 
 The AI agent is the "what and why" layer (see Section 3). It doesn't execute anything directly — it interprets the situation, proposes a plan, and hands that plan off for human approval before the orchestration engine ever touches a target system. This is a direct application of the reliability-first principle in Section 2.
@@ -282,6 +312,8 @@ The agent and engine are decoupled: the agent produces a proposed plan, a human 
 - Where and how do scripts actually execute?
 - How do we handle on-prem, cloud, and hybrid scenarios?
 - Connection management and security.
+
+> 📖 Plain-language companion: [`execution-environment.md`](execution-environment.md)
 
 **Role in the System**
 
@@ -321,6 +353,8 @@ health_check(target) -> bool
 - What is the Engine State Store and why does it exist as its own component?
 - What information lives there, and who/what reads and writes it?
 - How does it relate to the other components?
+
+> 📖 Plain-language companion: [`engine-state-store.md`](engine-state-store.md)
 
 **Resolution (see `open-questions.md` RC-1, RC-2):** `sab-engine` and `sab-kb` are independent products for now, with no assumed integration. `sab-engine` gets its own small internal store — described below — scoped only to what the orchestration engine and AI agent need (run history, target state). Whether `sab-engine`'s AI agent ever queries `sab-kb` for broader context is a real future question, deliberately left open rather than assumed, since `sab-engine` isn't being built yet (see RC-5 below).
 
@@ -372,6 +406,8 @@ Per the reliability-first principle (Section 2), this store is arguably what *ea
 - Module development patterns and guidelines
 - Community contribution framework
 
+> 📖 Plain-language companion: [`community-contribution-framework.md`](community-contribution-framework.md)
+
 **Foundation: Two Contracts Already Defined**
 
 Extensibility isn't a separate mechanism bolted on — it falls directly out of two contracts already established:
@@ -414,7 +450,7 @@ A dedicated place where users — community members, third-party developers, and
 
 **Relationship to the rest of the system**
 
-- The marketplace doesn't replace the open source module library (4.2) — it sits alongside/on top of it. Community modules can still be free and live in the open source repo; the marketplace is specifically for discoverability and (eventually) commerce.
+- The marketplace doesn't replace the open source module library (4.2, the OSML) — it sits alongside/on top of it. Community modules can still be free and live in the open source repo; the marketplace is specifically for discoverability and (eventually) commerce.
 - Anything listed in the marketplace still has to satisfy the module or connector contract — the marketplace is a distribution and monetization layer, not a different technical standard. This keeps quality/trust consistent regardless of whether something is free or paid.
 - Likely lives in or alongside the **commercial layer repo** (per the four-repo structure — core engine, module library, `sab-kb`, commercial layer) since it's part of the monetization strategy, even in its free starting phase.
 - Maps naturally onto the tiered trust model (MP-2, `open-questions.md`): **Community** and **Verified** tiers stay free, and the **Certified** tier — hardened, tested, support-backed — is where the Fedora/RHEL-style paid value concentrates (see Section 1's business model). This gives the marketplace a monetization mechanism consistent with early Red Hat's actual approach, rather than an app-store-style paywall on functionality itself.
@@ -632,7 +668,7 @@ The roadmap isn't just feature phases — it's also a trust/autonomy maturity la
   - The WinRM connector (4.4) — the first execution environment, shipped as core rather than a community extension since on-prem Windows is the initial primary target
   - CLI/API to trigger and monitor workflows
 
-  **2. `sab-hq/sab-modules` (module library) — open source**
+  **2. `sab-hq/sab-modules` — the Open Source Module Library (OSML) — open source**
 
   - PowerShell/Bash modules following the module contract, starting with the patching set (pre-flight check, stage, apply, validate, rollback)
   - Workflow definitions (recipes stringing modules together, per Section 3's workflow/module distinction)
