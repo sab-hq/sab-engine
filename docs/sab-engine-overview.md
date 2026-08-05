@@ -65,7 +65,7 @@ Per the roadmap (`SAB_Design_Document.md`, Section 9), Phase 1 doesn't need the 
 ## Open Items Specific to This Repo
 
 - **AR-4** (third-party integration API surface) — deferred until Phase 3/4, not needed for Phase 1
-- **SE-2** (sandboxing model — Docker recommended) — relevant once module execution isolation is actually implemented here
+- **SE-2** (sandboxing model) — 🟢 confirmed: Docker containers. Relevant once module execution isolation is actually implemented here.
 - Exact state machine and concurrency model (flagged in Section 4.1 as still needing detail beyond the AR-1 resolution)
 - CLI/API surface design — not yet started
 

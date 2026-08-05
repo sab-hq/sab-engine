@@ -521,7 +521,7 @@ This is largely already designed — Section 4.1 (orchestration engine) logs eve
 Raised in Section 4.4: a failure or hang against one target shouldn't affect others running in parallel. Beyond that:
 - Module execution should be sandboxed/isolated enough that a misbehaving module (bug, not malice) can't affect the orchestration engine itself or other concurrent runs
 - This matters even more once the Marketplace (5.1) introduces third-party-authored modules — isolation is part of what makes a tiered trust model (community vs. verified) technically meaningful rather than just a label
-- **Design direction (see `open-questions.md`, SE-2):** containers (Docker) as the sandboxing mechanism — process/resource isolation without full-VM overhead, and it matches the pattern seen in comparable tools (Kestra runs arbitrary tasks in containers for the same reason).
+- **Design decision (see `open-questions.md`, SE-2 — confirmed):** containers (Docker) as the sandboxing mechanism — process/resource isolation without full-VM overhead, and it matches the pattern seen in comparable tools (Kestra runs arbitrary tasks in containers for the same reason).
 
 **Tamper-evidence, made concrete (v0.1.2 detail).** The simplest version of "tamper-evident" that fits the existing `AuditEntry` model (Section 4.1): each entry is written once and never updated, and each entry's hash chains to the previous entry's hash (append-only, hash-linked) — a common, low-effort pattern that makes silent post-hoc edits detectable without needing a heavier solution (e.g. a dedicated ledger system) that would be overkill before there's a specific compliance framework driving the requirement.
 
