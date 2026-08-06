@@ -8,7 +8,7 @@
 
 The **orchestration engine** is the part of SAB that actually carries out an approved plan — it's the only piece of the system that touches real servers, and its whole job is running the right modules in the right order, tracking exactly what's happening, and automatically cleaning up if something goes wrong.
 
-> **Current status:** the state machine and audit trail described in this doc are real, working code as of PD-4/PD-8 in `pre-development-checklist.md` — not just a plan. Sequencing (actually calling modules) is still being built.
+> **Current status:** the state machine and audit trail described in this doc are real, working code as of PD-4/PD-8 in `pre-development-checklist.md` — not just a plan. The claim/lease concurrency pattern (PD-5) is also done — more than one worker can now safely pull from the queue without racing each other. Sequencing (actually calling modules) is still being built.
 
 ## The problem it solves
 
