@@ -10,7 +10,7 @@
 
 ## Changelog
 
-- **v0.1.2** (Aug 4–6, 2026) — Added RMM/PSA/MCP connector research to Section 6 (specific integration priorities: NinjaOne, ConnectWise Manage, Autotask PSA, Ansible Automation Platform/AWX, Hudu, plus partner-program notes and a phased rollout) and to Section 8 (2026 MCP ecosystem findings, including documented security risks that reinforce the recommend-and-approve principle). Also closed out most remaining "to be filled in" placeholders across Sections 2–9 with concrete first-draft detail (state machine, module metadata schema, connector interface, Engine State Store data model, API surface) — items that genuinely need Brock's input (revenue share %, compliance framework target, target dates) are explicitly flagged rather than invented, and collected in Section 10. Reformatted headers throughout so the label and its following text are visually separated, not run together. Confirmed Docker containers as the module sandboxing mechanism (SE-2). Confirmed every module and every workflow requires a unique ID (new AR-5); reflected in Sections 3 and 4.2. Confirmed "Open Source Module Library (OSML)" as the official name for the module library / `sab-hq/sab-modules` repo (new AR-6); reflected in Sections 4.2, 5.1, and 9. Confirmed "ESS" as the official shorthand for the Engine State Store (new AR-7); reflected in Section 4.5. Added a full set of plain-language companion docs (`what-is-sab.md` through `open-source-module-library.md`) and cross-linked them throughout this document. Added `pre-development-checklist.md`, a dependency-ordered pre-code task list (PD-1 through PD-29). **Corrected Section 9's Sequencing Note**, which had overstated — on this document's own initiative, not Brock's instruction — that `sab-kb` must ship strictly before `sab-engine`'s Phase 1; the actual, twice-confirmed resolution (RC-5 originally, PD-1 again this session) is that the two are worked on in parallel. **Phase 1 development began (Aug 6):** real C#/.NET code now exists and is verified — the solution scaffold, the PostgreSQL/EF Core schema, and a working, tested state machine with hash-linked audit logging (PD-1 through PD-4 and PD-8, all done and confirmed by Brock). This is the first point where `sab-engine` has actual code, not just design. `pre-development-checklist.md` and `sab-engine-overview.md` are the up-to-date sources for exact build status — not duplicated here.
+- **v0.1.2** (Aug 4–6, 2026) — Added RMM/PSA/MCP connector research to Section 6 (specific integration priorities: NinjaOne, ConnectWise Manage, Autotask PSA, Ansible Automation Platform/AWX, Hudu, plus partner-program notes and a phased rollout) and to Section 8 (2026 MCP ecosystem findings, including documented security risks that reinforce the recommend-and-approve principle). Also closed out most remaining "to be filled in" placeholders across Sections 2–9 with concrete first-draft detail (state machine, module metadata schema, connector interface, Engine State Store data model, API surface) — items that genuinely need Brock's input (revenue share %, compliance framework target, target dates) are explicitly flagged rather than invented, and collected in Section 10. Reformatted headers throughout so the label and its following text are visually separated, not run together. Confirmed Docker containers as the module sandboxing mechanism (SE-2). Confirmed every module and every workflow requires a unique ID (new AR-5); reflected in Sections 3 and 4.2. Confirmed "Open Source Module Library (OSML)" as the official name for the module library / `sab-hq/sab-modules` repo (new AR-6); reflected in Sections 4.2, 5.1, and 9. Confirmed "ESS" as the official shorthand for the Engine State Store (new AR-7); reflected in Section 4.5. Added a full set of plain-language companion docs (`what-is-sab.md` through `open-source-module-library.md`) and cross-linked them throughout this document. Added `pre-development-checklist.md`, a dependency-ordered pre-code task list (PD-1 through PD-29). **Corrected Section 9's Sequencing Note**, which had overstated — on this document's own initiative, not Brock's instruction — that `sab-kb` must ship strictly before `sab-engine`'s Phase 1; the actual, twice-confirmed resolution (RC-5 originally, PD-1 again this session) is that the two are worked on in parallel. **Phase 1 development began (Aug 6):** real C#/.NET code now exists and is verified — the solution scaffold, the PostgreSQL/EF Core schema, and a working, tested state machine with hash-linked audit logging (PD-1 through PD-4 and PD-8, all done and confirmed by Brock). This is the first point where `sab-engine` has actual code, not just design. `pre-development-checklist.md` and `sab-engine-overview.md` are the up-to-date sources for exact build status — not duplicated here. **This design document itself moved into `docs/design/`** (Aug 6) — `open-questions.md` and `pre-development-checklist.md` stay at `docs/` root; the two phase docs live at `docs/phases/`; and the full plain-language companion series, now including `sab-engine-overview.md` too, lives in `docs/learn/`. Every link in this file to a sibling doc has been updated to `../learn/filename.md` for the companion docs, and `../filename.md` or `../phases/filename.md` for everything else, accordingly.
 - **v0.1.1** (Aug 2, 2026) — Full document buildout: Executive Summary, workflow/module architecture, all of Section 4 including the new Engine State Store (4.5), Marketplace (5.1), Integration (6), Security (7), Existing Solutions (8), and the Phase 0–4 roadmap (9). Tech stack, licensing, and repo structure confirmed via `open-questions.md`.
 - **v0.1.0** — Initial document. Section 2 (System Requirements and Goals) established as the founding principle; all other sections were placeholders.
 
@@ -43,18 +43,20 @@ Each core concept in this document also has a plain-language companion doc, writ
 
 | Doc | Covers |
 |---|---|
-| [`what-is-sab.md`](what-is-sab.md) | The overall elevator pitch — start here |
-| [`workflows.md`](workflows.md) | Section 3/4.2 — the recipe concept |
-| [`modules.md`](modules.md) | Section 4.2 — the individual step/building-block concept |
-| [`ai-agent-layer.md`](ai-agent-layer.md) | Section 4.3 — how SAB decides what to propose |
-| [`recommend-and-approve-mode.md`](recommend-and-approve-mode.md) | Section 2 — the human approval gate |
-| [`orchestration-engine.md`](orchestration-engine.md) | Section 4.1 — what actually runs an approved plan |
-| [`execution-environment.md`](execution-environment.md) | Section 4.4 — how SAB reaches a real server |
-| [`engine-state-store.md`](engine-state-store.md) | Section 4.5 — SAB's memory of past runs (ESS) |
-| [`ess-vs-sab-kb.md`](ess-vs-sab-kb.md) | Section 4.5 / `open-questions.md` RC-1–RC-3 — why SAB-KB covers a gap ESS structurally can't reach, not a "bigger" version of it |
-| [`what-is-sab-kb.md`](what-is-sab-kb.md) | Section 1 — what the separate, paid SAB-KB product actually is |
-| [`community-contribution-framework.md`](community-contribution-framework.md) | Section 5 — how anyone can contribute |
-| [`open-source-module-library.md`](open-source-module-library.md) | Section 4.2/9 — the OSML, where modules and workflows actually live |
+| [`what-is-sab.md`](../learn/what-is-sab.md) | The overall elevator pitch — start here |
+| [`workflows.md`](../learn/workflows.md) | Section 3/4.2 — the recipe concept |
+| [`modules.md`](../learn/modules.md) | Section 4.2 — the individual step/building-block concept |
+| [`ai-agent-layer.md`](../learn/ai-agent-layer.md) | Section 4.3 — how SAB decides what to propose |
+| [`recommend-and-approve-mode.md`](../learn/recommend-and-approve-mode.md) | Section 2 — the human approval gate |
+| [`orchestration-engine.md`](../learn/orchestration-engine.md) | Section 4.1 — what actually runs an approved plan |
+| [`execution-environment.md`](../learn/execution-environment.md) | Section 4.4 — how SAB reaches a real server |
+| [`engine-state-store.md`](../learn/engine-state-store.md) | Section 4.5 — SAB's memory of past runs (ESS) |
+| [`ess-vs-sab-kb.md`](../learn/ess-vs-sab-kb.md) | Section 4.5 / `open-questions.md` RC-1–RC-3 — why SAB-KB covers a gap ESS structurally can't reach, not a "bigger" version of it |
+| [`what-is-sab-kb.md`](../learn/what-is-sab-kb.md) | Section 1 — what the separate, paid SAB-KB product actually is |
+| [`community-contribution-framework.md`](../learn/community-contribution-framework.md) | Section 5 — how anyone can contribute |
+| [`open-source-module-library.md`](../learn/open-source-module-library.md) | Section 4.2/9 — the OSML, where modules and workflows actually live |
+
+Also see [`phases/phase01.md`](../phases/phase01.md) and [`phases/phase02.md`](../phases/phase02.md) for what each development phase actually covers and how far along it is.
 
 ---
 
@@ -100,7 +102,7 @@ The first proof of concept is Windows Server patching on-premises — chosen bec
 ## 2. System Requirements and Goals
 *What must the system do? What are the non-negotiable requirements versus stretch goals?*
 
-> 📖 Plain-language companion: [`recommend-and-approve-mode.md`](recommend-and-approve-mode.md)
+> 📖 Plain-language companion: [`recommend-and-approve-mode.md`](../learn/recommend-and-approve-mode.md)
 
 **Core Design Principle: Reliability and Gradual Autonomy**
 
@@ -119,7 +121,7 @@ The system must be solid and predictable before it is trusted to act autonomousl
 ## 3. Core Architecture Overview
 *How all the pieces fit together at a 30,000-foot level — data flow, component relationships, overall design philosophy.*
 
-> 📖 Plain-language companions: [`what-is-sab.md`](what-is-sab.md), [`workflows.md`](workflows.md), [`modules.md`](modules.md)
+> 📖 Plain-language companions: [`what-is-sab.md`](../learn/what-is-sab.md), [`workflows.md`](../learn/workflows.md), [`modules.md`](../learn/modules.md)
 
 **Key Concept: Workflow vs. Module**
 
@@ -165,7 +167,7 @@ Each layer has one job and doesn't reach into another layer's responsibility:
 - How does it manage state and execution flow?
 - What are the inputs and outputs?
 
-> 📖 Plain-language companion: [`orchestration-engine.md`](orchestration-engine.md)
+> 📖 Plain-language companion: [`orchestration-engine.md`](../learn/orchestration-engine.md)
 
 **Role in the System**
 
@@ -204,7 +206,7 @@ This is what makes "what's currently pending my approval" a simple query rather 
 ### 4.2 Module Library System (OSML)
 *See Section 3 for the foundational workflow-vs-module distinction: modules are atomic, reusable units of work; workflows are the recipes that string modules together for a specific use case. This system — conceptually and as the actual `sab-hq/sab-modules` repository — is officially named the **Open Source Module Library (OSML)**, per `open-questions.md` AR-6.*
 
-> 📖 Plain-language companions: [`modules.md`](modules.md), [`workflows.md`](workflows.md), [`open-source-module-library.md`](open-source-module-library.md)
+> 📖 Plain-language companions: [`modules.md`](../learn/modules.md), [`workflows.md`](../learn/workflows.md), [`open-source-module-library.md`](../learn/open-source-module-library.md)
 
 - How are reusable components structured and catalogued?
 - How do modules interact with the orchestration engine?
@@ -275,7 +277,7 @@ tests:
 - How do they interact with the orchestration engine?
 - What information do they need to operate effectively?
 
-> 📖 Plain-language companion: [`ai-agent-layer.md`](ai-agent-layer.md)
+> 📖 Plain-language companion: [`ai-agent-layer.md`](../learn/ai-agent-layer.md)
 
 **Role in the System**
 
@@ -315,7 +317,7 @@ The agent and engine are decoupled: the agent produces a proposed plan, a human 
 - How do we handle on-prem, cloud, and hybrid scenarios?
 - Connection management and security.
 
-> 📖 Plain-language companion: [`execution-environment.md`](execution-environment.md)
+> 📖 Plain-language companion: [`execution-environment.md`](../learn/execution-environment.md)
 
 **Role in the System**
 
@@ -356,7 +358,7 @@ health_check(target) -> bool
 - What information lives there, and who/what reads and writes it?
 - How does it relate to the other components?
 
-> 📖 Plain-language companions: [`engine-state-store.md`](engine-state-store.md), [`ess-vs-sab-kb.md`](ess-vs-sab-kb.md)
+> 📖 Plain-language companions: [`engine-state-store.md`](../learn/engine-state-store.md), [`ess-vs-sab-kb.md`](../learn/ess-vs-sab-kb.md)
 
 **Resolution (see `open-questions.md` RC-1, RC-2):** `sab-engine` and `sab-kb` are independent products for now, with no assumed integration. `sab-engine` gets its own small internal store — described below — scoped only to what the orchestration engine and AI agent need (run history, target state). Whether `sab-engine`'s AI agent ever queries `sab-kb` for broader context is a real future question, deliberately left open rather than assumed, since `sab-engine` isn't being built yet (see RC-5 below).
 
@@ -408,7 +410,7 @@ Per the reliability-first principle (Section 2), this store is arguably what *ea
 - Module development patterns and guidelines
 - Community contribution framework
 
-> 📖 Plain-language companion: [`community-contribution-framework.md`](community-contribution-framework.md)
+> 📖 Plain-language companion: [`community-contribution-framework.md`](../learn/community-contribution-framework.md)
 
 **Foundation: Two Contracts Already Defined**
 
@@ -649,6 +651,8 @@ RMM/PSA platforms serving MSPs face their own well-documented frustrations — v
 - **Phase 3:** Cloud and hybrid support
 - **Phase 4:** Community and open source launch
 
+> 📖 Phase-by-phase detail: [`phases/phase01.md`](../phases/phase01.md), [`phases/phase02.md`](../phases/phase02.md)
+
 **Two Axes of Progress**
 
 The roadmap isn't just feature phases — it's also a trust/autonomy maturity ladder (Section 4.3) that runs alongside them. Every phase below starts in recommend-and-approve mode; moving toward approve-by-exception or full autonomy for any given workflow is a separate, later milestone earned through track record (via SAB-KB), not something scheduled by calendar date.
@@ -697,7 +701,7 @@ The roadmap isn't just feature phases — it's also a trust/autonomy maturity la
 **Sequencing Note (see `open-questions.md` RC-5, and `pre-development-checklist.md` PD-1, confirmed by Brock):** The phases below describe `sab-engine`'s own build path. Earlier drafts of this note incorrectly stated that `sab-kb` should ship *before* `sab-engine`'s Phase 1 as a strict sequencing rule — that was this document's own overstatement, not something Brock ever said, and it's corrected here. The actual resolution, confirmed twice now (RC-5 and PD-1): **`sab-engine` and `sab-kb` are worked on in parallel**, not one-then-the-other. `sab-kb` does have more validation behind it right now (working code, a resolved business model), which may reasonably mean it draws more hands-on coding time day to day — but that's a resourcing reality, not a rule that `sab-engine` work waits. Treat `sab-engine`'s phases below as the roadmap for *this repo specifically*, running alongside `sab-kb`'s own build-readiness docs (now live at `github.com/sab-hq/sab-kb/docs`), not after them.
 
 ### Phase 1: Windows Server Patching Proof of Concept
-*Prove the core architecture works end-to-end on the narrowest possible slice.*
+*Prove the core architecture works end-to-end on the narrowest possible slice. Full detail: [`phases/phase01.md`](../phases/phase01.md).*
 - Core orchestration engine: sequencing, state tracking, rollback triggering (Section 4.1) — minimum viable version
 - A small set of patching modules: pre-flight check, stage, apply, validate, rollback (Section 4.2)
 - AI agent layer in recommend-and-approve mode only — no autonomy stretch goals at this phase (Section 4.3)
@@ -707,7 +711,7 @@ The roadmap isn't just feature phases — it's also a trust/autonomy maturity la
 - **Exit criteria:** SAB can reliably patch a lab/low-stakes Windows Server end-to-end, with a human approving each run and a tested rollback path proven to work, not just documented
 
 ### Phase 2: Expand Module Library and Workflows
-*Prove the module/workflow model generalizes beyond patching.*
+*Prove the module/workflow model generalizes beyond patching. Full detail: [`phases/phase02.md`](../phases/phase02.md).*
 - Add workflows adjacent to patching that reuse the same architecture — natural candidates: service restarts, basic provisioning tasks, backup verification (exact scope TBD)
 - Begin validating the module contract (Section 4.2) against a second real use case, not just patching — this is where contract gaps will surface
 - Start fleshing out SAB-KB into its fuller shared-knowledge role (Section 4.5) now that there's more than one workflow's worth of history to learn from
