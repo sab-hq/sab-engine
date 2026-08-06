@@ -1,0 +1,35 @@
+version: "3.9"
+
+# Local development Postgres for sab-engine's Engine State Store (ESS).
+# See docs/SAB_Design_Document_v0.1.2.md, Section 4.5.
+#
+# WARNING: the credentials below are local-dev-only defaults, checked
+# into source control on purpose. They are NOT real secrets and must
+# never be reused for anything staging/production — see Section 7
+# ("Secrets Management") for how real credentials are meant to be
+# handled (a proper secrets store, never plaintext in a committed file).
+#
+# NOTE: mapped to host port 5433, not the default 5432 — Brock's machine
+# already has a native PostgreSQL 15 install bound to 5432 as a Windows
+# service, and reusing that port silently routed every connection to the
+# wrong database (same port, two totally different Postgres instances).
+# 5433 avoids the collision. If you ever need to change this, update the
+# connection strings in src/SabEngine.Api/appsettings.json and
+# src/SabEngine.Data/SabEngineDbContextFactory.cs to match.
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: sabengine-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sabengine
+      POSTGRES_USER: sabengine
+      POSTGRES_PASSWORD: sabengine_dev_only
+    ports:
+      - "5433:5432"
+    volumes:
+      - sabengine-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  sabengine-postgres-data:

@@ -4,11 +4,19 @@
     See docs/SAB_Design_Document_v0.1.2.md, Section 4.5, and
     engine-state-store.md for the plain-language version.
 
-    PostgreSQL is the confirmed backend (TS-3). EF Core + Npgsql package
-    references, the DbContext, and the actual schema implementation are
-    PD-3 in pre-development-checklist.md — intentionally not added yet,
-    so this scaffolding step stays buildable on its own.
+    PostgreSQL is the confirmed backend (TS-3), via EF Core + Npgsql.
+    Design-time tooling (Microsoft.EntityFrameworkCore.Design) is
+    referenced here so `dotnet ef migrations add` works from this
+    project — see pre-development-checklist.md, PD-3.
   -->
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\SabEngine.Core\SabEngine.Core.csproj" />
   </ItemGroup>

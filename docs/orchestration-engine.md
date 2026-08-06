@@ -8,6 +8,8 @@
 
 The **orchestration engine** is the part of SAB that actually carries out an approved plan — it's the only piece of the system that touches real servers, and its whole job is running the right modules in the right order, tracking exactly what's happening, and automatically cleaning up if something goes wrong.
 
+> **Current status:** the state machine and audit trail described in this doc are real, working code as of PD-4/PD-8 in `pre-development-checklist.md` — not just a plan. Sequencing (actually calling modules) is still being built.
+
 ## The problem it solves
 
 By the time a plan reaches this point, a lot has already happened: the AI agent has proposed a plan (see `recommend-and-approve-mode.md`), and a human has approved it. But approving a plan and actually *executing* it reliably are two very different problems. Real execution against real infrastructure has to survive things like:

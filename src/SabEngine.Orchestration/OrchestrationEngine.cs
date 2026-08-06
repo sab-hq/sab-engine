@@ -6,15 +6,17 @@ namespace SabEngine.Orchestration;
 /// out — sequencing modules, tracking state, triggering rollback
 /// automatically on failure.
 ///
-/// Implementation is pre-development-checklist.md PD-4 (state machine)
-/// and PD-5 (concurrency model). Deliberately left as a stub here — this
-/// commit is project scaffolding (PD-2), not the engine itself.
+/// The state machine itself now lives in <see cref="WorkflowRunStateMachine"/>
+/// (pre-development-checklist.md, PD-4, done). What's still a stub here:
+/// actually calling modules in sequence during the Executing state (via
+/// SabEngine.Execution's IExecutionConnector) and triggering rollback
+/// automatically on module failure — that wiring isn't itemized as its
+/// own PD- entry yet; add one when picking it up.
 /// </summary>
 public sealed class OrchestrationEngine
 {
-    // TODO(PD-4): implement the state machine transitions
-    //   Requested -> PlanDrafted -> PendingApproval -> Approved/Declined
-    //   -> Executing -> Completed/Failed -> RolledBack
-    // TODO(PD-5): implement the claim/lease concurrency pattern for
-    //   stateless workers running against shared PostgreSQL state
+    // TODO: wire WorkflowRunStateMachine + IExecutionConnector together
+    //   so entering the Executing state actually calls modules in order,
+    //   and a module failure triggers TransitionAsync(..., Failed, ...)
+    //   followed by the module's own rollback procedure.
 }
