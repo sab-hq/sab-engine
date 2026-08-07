@@ -11,6 +11,8 @@
 
 **License:** Apache 2.0 (confirmed, `open-questions.md` LM-1) — open source, permissive, no restriction on rebuilding or rehosting, consistent with the early-Red-Hat business model direction.
 
+**CI:** `.github/workflows/ci.yml` runs on every push/PR — two jobs split by OS (Linux for everything except the Windows-only Credential Manager tests, using a real Postgres service container; Windows for the full `SabEngine.Execution.Tests` project). Verified green on GitHub Actions (PD-10, done).
+
 ## Tech Stack
 
 | Component | Choice | Status |
@@ -58,7 +60,7 @@
 ## Phase 1 Scope (Minimum Viable Version)
 
 Per the roadmap (`SAB_Design_Document_v0.1.2.md`, Section 9), Phase 1 doesn't need the full vision of this repo — just enough to prove the architecture end-to-end on Windows Server patching. Real progress so far:
-- ✅ Solution scaffold, database schema, a production-quality state machine with a real audit trail, multi-worker-safe concurrency (claim/lease), a real Semantic-Kernel-backed AI agent with hard-rule enforcement, working local PowerShell interop, and a real Windows Credential Manager-backed secrets store — further along than "minimum viable" already, not a stripped-down placeholder
+- ✅ Solution scaffold, database schema, a production-quality state machine with a real audit trail, multi-worker-safe concurrency (claim/lease), a real Semantic-Kernel-backed AI agent with hard-rule enforcement, working local PowerShell interop, a real Windows Credential Manager-backed secrets store, and a working two-job CI pipeline (Linux + Windows, both verified green) — further along than "minimum viable" already, not a stripped-down placeholder
 - ⬜ The first real modules (`pre-flight-check`, `stage-patches`, `apply-patches`, `validate`) — not yet written (PD-14–PD-17)
 - ⬜ Wiring the agent to a real model (an actual OpenAI/Azure OpenAI connector + API key) — not yet done, needs a real credential from Brock
 - ⬜ The actual WinRM connector, combining PowerShell interop and the secrets store to reach a remote server — not yet built (PD-17–PD-20)

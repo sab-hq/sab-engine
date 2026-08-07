@@ -29,6 +29,7 @@ on:
 jobs:
   test-cross-platform:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     services:
       postgres:
@@ -69,6 +70,7 @@ jobs:
 
   test-windows:
     runs-on: windows-latest
+    timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v4
@@ -85,4 +87,18 @@ jobs:
         run: dotnet build --no-restore
 
       - name: Test SabEngine.Execution.Tests (includes Windows Credential Manager tests)
-        run: dotnet test tests/SabEngine.Execution.Tests/SabEngine.Execution.Tests.csproj --no-build
+        # --blame-hang-timeout: if a test hangs instead of failing
+        # normally, dotnet test kills it after 2 minutes and writes a
+        # diagnostic dump identifying exactly which test was stuck,
+        # rather than the whole job silently running until the
+        # job-level timeout-minutes above kills it with no useful
+        # information at all. See pre-development-checklist.md, PD-10.
+        run: dotnet test tests/SabEngine.Execution.Tests/SabEngine.Execution.Tests.csproj --no-build --blame-hang-timeout 2m --blame-hang-dump-type mini
+
+      - name: Upload hang dump (if the test step above actually hung)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hang-dump
+          path: tests/SabEngine.Execution.Tests/**/*.dmp
+          if-no-files-found: ignore
