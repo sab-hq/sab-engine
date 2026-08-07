@@ -8,6 +8,8 @@
 
 The **AI agent layer** is the part of SAB that looks at a real situation, figures out exactly what should happen, and proposes a plan with its reasoning — but it never touches a real server itself; that's always someone else's job (see `recommend-and-approve-mode.md` and `orchestration-engine.md`).
 
+> **Current status:** the plan-drafting logic described in this doc is real, working code as of PD-6 in `pre-development-checklist.md` — built on Microsoft Semantic Kernel, with the hard-rule validation (never propose an unapproved or rollback-less module) enforced right here, not just downstream. Not yet done: wiring to an actual live model (needs a real API key) and a real module catalog to propose from (no real modules exist yet).
+
 ## The problem it solves
 
 A workflow (see `workflows.md`) is a generic recipe — "patch this server" — but no two servers are in exactly the same situation. One might have an unusually long uptime. One might have failed a patch attempt before. One might be sitting right up against a maintenance window deadline. A recipe that's identical no matter the situation isn't actually very smart.
