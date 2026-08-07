@@ -8,7 +8,7 @@
 
 The **execution environment** is the part of SAB that actually reaches out and touches a real server — it's the "hands" that carry out a module's instructions, and it's built so the rest of SAB never has to know or care whether that server is on-prem, in the cloud, or somewhere in between.
 
-> **Current status:** the PowerShell interop primitive this doc describes is real, working code as of PD-7 in `pre-development-checklist.md` — it can run a script and return a structured result, correctly handling both PowerShell's non-terminating errors and an outright `throw`. What's not built yet: the actual WinRM connector that points this interop at a *remote* server instead of running locally (PD-17–PD-20) — that's the part that turns this from "can run PowerShell" into "can reach a real target system."
+> **Current status:** the PowerShell interop primitive this doc describes is real, working code as of PD-7 in `pre-development-checklist.md` — it can run a script and return a structured result, correctly handling both PowerShell's non-terminating errors and an outright `throw`. The credential-handling piece (Section 4.4's "how the engine authenticates to target servers without modules or the AI agent ever seeing raw credentials") is also real now, as of PD-9 — secrets are stored in Windows Credential Manager, resolved only at connection time. What's not built yet: the actual WinRM connector that combines both of these and points them at a *remote* server instead of running locally (PD-17–PD-20) — that's the part that turns this from "can run PowerShell and hold a secret" into "can reach a real target system."
 
 ## The problem it solves
 

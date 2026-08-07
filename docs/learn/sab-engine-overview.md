@@ -19,6 +19,7 @@
 | AI agent layer | C#/.NET + Microsoft Semantic Kernel | 🟢 Resolved (TS-2) — Semantic Kernel integrated and tested (PD-6, done). Not yet wired to a real model — no API key configured, deliberately (see below). |
 | State persistence | PostgreSQL | 🟢 Resolved (TS-3) — real schema implemented via EF Core + Npgsql, migration applied (PD-3, done) |
 | PowerShell interop | `System.Management.Automation` (via `Microsoft.PowerShell.SDK`) | 🟢 Resolved (TS-1's corollary) — real local execution wired and tested (PD-7, done). Remote (WinRM) execution not yet built (PD-17–PD-20).
+| Secrets backend | Windows Credential Manager (Phase 1 default) | 🟢 Resolved (SE-1) — real P/Invoke-backed implementation wired and tested (PD-9, done), behind a pluggable `ISecretStore` contract so Vault can swap in later without touching callers.
 
 ## What Lives Here — Current Implementation Status
 
@@ -42,7 +43,8 @@
 
 ### 4. WinRM Connector (Section 4.4)
 - **PowerShell interop — done, local execution only (PD-7).** `PowerShellExecutor` (`src/SabEngine.Execution`) runs a script via `Microsoft.PowerShell.SDK` and returns a structured result (output, errors, a `Succeeded` flag) — correctly handles both PowerShell's non-terminating errors (`Write-Error`) and terminating ones (`throw`), which turned out to need different handling entirely. Covered by 5 passing tests in `tests/SabEngine.Execution.Tests`, run against a real local PowerShell engine (no fakes — there's no meaningful way to fake whether PowerShell interop actually works).
-- **The actual WinRM connector — not yet built (PD-17–PD-20).** `PowerShellExecutor` is the interop primitive the connector will use; it doesn't yet point at a remote session, only a local one. Building the `IExecutionConnector` implementation that actually reaches a remote Windows Server is still ahead.
+- **Secrets backend — done (PD-9).** `WindowsCredentialManagerSecretStore` (`src/SabEngine.Execution`) implements `ISecretStore` (Core) against real Windows Credential Manager via P/Invoke — this is what a future connector resolves a `credential_handle` against at connection time (Section 7), so modules and the AI agent never see a raw secret. The riskiest code in the project so far (hand-written Win32 struct marshaling), verified clean on the first attempt across 6 tests including a Unicode round-trip.
+- **The actual WinRM connector — not yet built (PD-17–PD-20).** `PowerShellExecutor` and `WindowsCredentialManagerSecretStore` are both interop primitives the connector will use together; neither is wired into an `IExecutionConnector` implementation yet, and neither points at a *remote* session/target. Building that is still ahead.
 
 ### 5. CLI / API
 - `SabEngine.Api` exists as the composition root and currently just registers the database connection via DI (PD-3). Real CLI/API surface design is still open (AR-4, deferred to Phase 3/4 per the roadmap).
@@ -56,10 +58,10 @@
 ## Phase 1 Scope (Minimum Viable Version)
 
 Per the roadmap (`SAB_Design_Document_v0.1.2.md`, Section 9), Phase 1 doesn't need the full vision of this repo — just enough to prove the architecture end-to-end on Windows Server patching. Real progress so far:
-- ✅ Solution scaffold, database schema, a production-quality state machine with a real audit trail, multi-worker-safe concurrency (claim/lease), a real Semantic-Kernel-backed AI agent with hard-rule enforcement, and working local PowerShell interop — further along than "minimum viable" already, not a stripped-down placeholder
+- ✅ Solution scaffold, database schema, a production-quality state machine with a real audit trail, multi-worker-safe concurrency (claim/lease), a real Semantic-Kernel-backed AI agent with hard-rule enforcement, working local PowerShell interop, and a real Windows Credential Manager-backed secrets store — further along than "minimum viable" already, not a stripped-down placeholder
 - ⬜ The first real modules (`pre-flight-check`, `stage-patches`, `apply-patches`, `validate`) — not yet written (PD-14–PD-17)
 - ⬜ Wiring the agent to a real model (an actual OpenAI/Azure OpenAI connector + API key) — not yet done, needs a real credential from Brock
-- ⬜ The actual WinRM connector, pointing PowerShell interop at a remote session instead of a local one — not yet built (PD-17–PD-20)
+- ⬜ The actual WinRM connector, combining PowerShell interop and the secrets store to reach a remote server — not yet built (PD-17–PD-20)
 - ⬜ A lab/low-stakes test environment to actually validate against (PD-11)
 
 `pre-development-checklist.md` is the authoritative, up-to-date tracker for exactly where this stands — this section is a summary, not the source of truth.
@@ -68,7 +70,7 @@ Per the roadmap (`SAB_Design_Document_v0.1.2.md`, Section 9), Phase 1 doesn't ne
 
 - **AR-4** (third-party integration API surface) — deferred until Phase 3/4, not needed for Phase 1
 - **SE-2** (sandboxing model) — 🟢 confirmed: Docker containers. Not yet implemented (PD-27).
-- **SE-1** (secrets backend) — HashiCorp Vault vs. native OS credential store, not yet decided which to actually stand up for Phase 1 (PD-9)
+- **SE-1** (secrets backend) — 🟢 confirmed and implemented: Windows Credential Manager for Phase 1, behind a pluggable `ISecretStore` contract (PD-9, done).
 - CLI/API surface design — not yet started, and correctly deferred (AR-4)
 
 ---
