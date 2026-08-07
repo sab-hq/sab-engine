@@ -8,6 +8,8 @@
 
 The **execution environment** is the part of SAB that actually reaches out and touches a real server — it's the "hands" that carry out a module's instructions, and it's built so the rest of SAB never has to know or care whether that server is on-prem, in the cloud, or somewhere in between.
 
+> **Current status:** the PowerShell interop primitive this doc describes is real, working code as of PD-7 in `pre-development-checklist.md` — it can run a script and return a structured result, correctly handling both PowerShell's non-terminating errors and an outright `throw`. What's not built yet: the actual WinRM connector that points this interop at a *remote* server instead of running locally (PD-17–PD-20) — that's the part that turns this from "can run PowerShell" into "can reach a real target system."
+
 ## The problem it solves
 
 A module (see `modules.md`) says something like "apply these patches" — but *how* you actually reach a server and run a command on it depends entirely on where that server lives. An on-prem Windows Server gets reached differently than a Linux box, which gets reached differently than a cloud VM. If every module had to know all of that connection detail itself, you'd end up rewriting the same "how do I connect and authenticate" logic over and over, and every module would be tangled up with infrastructure details that have nothing to do with what it's actually trying to accomplish.

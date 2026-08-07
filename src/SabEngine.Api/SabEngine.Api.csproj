@@ -15,6 +15,17 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <!--
+      Forces a single resolved version of Microsoft.CodeAnalysis.Common
+      and Microsoft.CodeAnalysis.CSharp across the dependency graph.
+      Without these, NuGet can't reconcile the versions EF Core Design's
+      Workspaces needs against the versions Microsoft.PowerShell.SDK (via
+      SabEngine.Execution) needs — error NU1107, one level at a time.
+      NuGet's own error messages suggested exactly this fix each time.
+      See pre-development-checklist.md, PD-7.
+    -->
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.9.2" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,13 +1,25 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!--
     SabEngine.Execution — execution environment connectors. See
-    docs/SAB_Design_Document_v0.1.2.md, Section 4.4, and
-    execution-environment.md for the plain-language version.
+    docs/design/SAB_Design_Document_v0.1.2.md, Section 4.4, and
+    docs/learn/execution-environment.md for the plain-language version.
 
-    The WinRM connector (the first real implementation of
+    Microsoft.PowerShell.SDK gives this project a real, self-hosted
+    PowerShell engine — this is what PD-7 (PowerShell interop) actually
+    runs on. It's referenced here rather than in SabEngine.Core because
+    Core has to stay dependency-free (Section 4.2), and interop is
+    specifically an execution-environment concern.
+
+    The WinRM connector itself (the first real implementation of
     SabEngine.Core.IExecutionConnector) is pre-development-checklist.md
-    PD-17 through PD-20 — not added yet.
+    PD-17 through PD-20 — not added yet. It will reuse this same
+    PowerShell interop, just pointed at a remote session instead of a
+    local one.
   -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.4.6" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\SabEngine.Core\SabEngine.Core.csproj" />
   </ItemGroup>

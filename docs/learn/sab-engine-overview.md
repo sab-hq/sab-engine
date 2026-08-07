@@ -18,7 +18,7 @@
 | Orchestration engine | C#/.NET 8 | 🟢 Resolved (TS-1) — real solution exists, builds cleanly (PD-2, done) |
 | AI agent layer | C#/.NET + Microsoft Semantic Kernel | 🟢 Resolved (TS-2) — Semantic Kernel integrated and tested (PD-6, done). Not yet wired to a real model — no API key configured, deliberately (see below). |
 | State persistence | PostgreSQL | 🟢 Resolved (TS-3) — real schema implemented via EF Core + Npgsql, migration applied (PD-3, done) |
-| PowerShell interop | `System.Management.Automation` | Native to the .NET choice; not yet wired in (PD-7) |
+| PowerShell interop | `System.Management.Automation` (via `Microsoft.PowerShell.SDK`) | 🟢 Resolved (TS-1's corollary) — real local execution wired and tested (PD-7, done). Remote (WinRM) execution not yet built (PD-17–PD-20).
 
 ## What Lives Here — Current Implementation Status
 
@@ -41,7 +41,8 @@
 - Real module implementations (PowerShell scripts) still live in the separate `sab-modules` (OSML) repo, per design — not here.
 
 ### 4. WinRM Connector (Section 4.4)
-- **Not yet built (PD-17–PD-20).** `SabEngine.Execution` project exists as a scaffold with a comment pointing to where this goes; no real implementation yet.
+- **PowerShell interop — done, local execution only (PD-7).** `PowerShellExecutor` (`src/SabEngine.Execution`) runs a script via `Microsoft.PowerShell.SDK` and returns a structured result (output, errors, a `Succeeded` flag) — correctly handles both PowerShell's non-terminating errors (`Write-Error`) and terminating ones (`throw`), which turned out to need different handling entirely. Covered by 5 passing tests in `tests/SabEngine.Execution.Tests`, run against a real local PowerShell engine (no fakes — there's no meaningful way to fake whether PowerShell interop actually works).
+- **The actual WinRM connector — not yet built (PD-17–PD-20).** `PowerShellExecutor` is the interop primitive the connector will use; it doesn't yet point at a remote session, only a local one. Building the `IExecutionConnector` implementation that actually reaches a remote Windows Server is still ahead.
 
 ### 5. CLI / API
 - `SabEngine.Api` exists as the composition root and currently just registers the database connection via DI (PD-3). Real CLI/API surface design is still open (AR-4, deferred to Phase 3/4 per the roadmap).
@@ -55,10 +56,10 @@
 ## Phase 1 Scope (Minimum Viable Version)
 
 Per the roadmap (`SAB_Design_Document_v0.1.2.md`, Section 9), Phase 1 doesn't need the full vision of this repo — just enough to prove the architecture end-to-end on Windows Server patching. Real progress so far:
-- ✅ Solution scaffold, database schema, a production-quality state machine with a real audit trail, multi-worker-safe concurrency (claim/lease), and a real Semantic-Kernel-backed AI agent with hard-rule enforcement — further along than "minimum viable" already, not a stripped-down placeholder
+- ✅ Solution scaffold, database schema, a production-quality state machine with a real audit trail, multi-worker-safe concurrency (claim/lease), a real Semantic-Kernel-backed AI agent with hard-rule enforcement, and working local PowerShell interop — further along than "minimum viable" already, not a stripped-down placeholder
 - ⬜ The first real modules (`pre-flight-check`, `stage-patches`, `apply-patches`, `validate`) — not yet written (PD-14–PD-17)
 - ⬜ Wiring the agent to a real model (an actual OpenAI/Azure OpenAI connector + API key) — not yet done, needs a real credential from Brock
-- ⬜ WinRM connector for on-prem Windows — not yet built (PD-17–PD-20)
+- ⬜ The actual WinRM connector, pointing PowerShell interop at a remote session instead of a local one — not yet built (PD-17–PD-20)
 - ⬜ A lab/low-stakes test environment to actually validate against (PD-11)
 
 `pre-development-checklist.md` is the authoritative, up-to-date tracker for exactly where this stands — this section is a summary, not the source of truth.
