@@ -16,7 +16,7 @@
 | Component | Choice | Status |
 |---|---|---|
 | Orchestration engine | C#/.NET 8 | 🟢 Resolved (TS-1) — real solution exists, builds cleanly (PD-2, done) |
-| AI agent layer | C#/.NET + Microsoft Semantic Kernel | 🟢 Resolved (TS-2) — project scaffolded (PD-2), Semantic Kernel integration itself not yet started (PD-6) |
+| AI agent layer | C#/.NET + Microsoft Semantic Kernel | 🟢 Resolved (TS-2) — Semantic Kernel integrated and tested (PD-6, done). Not yet wired to a real model — no API key configured, deliberately (see below). |
 | State persistence | PostgreSQL | 🟢 Resolved (TS-3) — real schema implemented via EF Core + Npgsql, migration applied (PD-3, done) |
 | PowerShell interop | `System.Management.Automation` | Native to the .NET choice; not yet wired in (PD-7) |
 
@@ -30,7 +30,10 @@
 - **Sequencing / failure handling / rollback triggering — not yet built.** The `OrchestrationEngine` class itself (as opposed to the state machine) is still a stub — wiring it to actually call modules in order via `IExecutionConnector`, and to trigger a module's rollback automatically on failure, isn't itemized as its own `pre-development-checklist.md` item yet.
 
 ### 2. AI Agent Layer (Section 4.3)
-- Domain types exist (`Plan`, `ProposedModuleStep` in `SabEngine.Core`), but the agent itself — reading target state and history, producing a proposal via Semantic Kernel — is not yet built (PD-6).
+- **Done — real plan-drafting via Semantic Kernel (PD-6).** `SabAgent` (`src/SabEngine.Agent`) builds a prompt from a workflow, target, and available-module list, calls the Kernel's chat completion service, and parses the response into a real `Plan`. Covered by 7 passing tests in `tests/SabEngine.Agent.Tests`, using a hand-written fake chat-completion service so the tests run fully offline.
+- **Section 4.1/4.2's hard rule enforced here too, as defense in depth.** The agent validates every proposed module against the candidate list before ever returning a plan — rejects unknown modules, anything not `production-approved`, and anything without a tested rollback. A model proposing something unsafe never even reaches a human; it's refused right here.
+- **Deliberately not done: wiring to a real model.** Only the core `Microsoft.SemanticKernel` package is referenced — no OpenAI/Azure OpenAI connector, no API key. Needs a real credential Brock supplies; not something to hardcode into this repo.
+- **Deliberately not done: a real module catalog.** No real modules exist yet (PD-14–PD-17), so the agent takes its available-module list as an input parameter rather than loading one itself. A `ModuleCandidate` type in `SabEngine.Core` makes that list constructible for now.
 - **Phase 1 constraint: recommend-and-approve only,** already reflected in the state machine itself — `PendingApproval → Approved/Declined` is a real, enforced transition, not just a plan.
 
 ### 3. Module Contract & Connector Contract (Sections 4.2, 4.4)
@@ -52,9 +55,9 @@
 ## Phase 1 Scope (Minimum Viable Version)
 
 Per the roadmap (`SAB_Design_Document_v0.1.2.md`, Section 9), Phase 1 doesn't need the full vision of this repo — just enough to prove the architecture end-to-end on Windows Server patching. Real progress so far:
-- ✅ Solution scaffold, database schema, a production-quality state machine with a real audit trail, and multi-worker-safe concurrency (claim/lease) — further along than "minimum viable" already, not a stripped-down placeholder
+- ✅ Solution scaffold, database schema, a production-quality state machine with a real audit trail, multi-worker-safe concurrency (claim/lease), and a real Semantic-Kernel-backed AI agent with hard-rule enforcement — further along than "minimum viable" already, not a stripped-down placeholder
 - ⬜ The first real modules (`pre-flight-check`, `stage-patches`, `apply-patches`, `validate`) — not yet written (PD-14–PD-17)
-- ⬜ AI agent in recommend-and-approve mode — the state machine enforces the *shape* of this already; the agent itself doesn't exist yet (PD-6)
+- ⬜ Wiring the agent to a real model (an actual OpenAI/Azure OpenAI connector + API key) — not yet done, needs a real credential from Brock
 - ⬜ WinRM connector for on-prem Windows — not yet built (PD-17–PD-20)
 - ⬜ A lab/low-stakes test environment to actually validate against (PD-11)
 

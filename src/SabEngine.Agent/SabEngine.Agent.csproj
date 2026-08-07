@@ -1,18 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <!--
-    SabEngine.Agent — the AI agent layer. See docs/SAB_Design_Document_v0.1.2.md,
-    Section 4.3, and ai-agent-layer.md for the plain-language version.
+    SabEngine.Agent — the AI agent layer. See docs/design/SAB_Design_Document_v0.1.2.md,
+    Section 4.3, and docs/learn/ai-agent-layer.md for the plain-language version.
 
-    Microsoft Semantic Kernel integration (TS-2, confirmed) is
-    pre-development-checklist.md PD-6 — the package reference and actual
-    plan-drafting logic aren't added yet, so this scaffolding step stays
-    buildable on its own.
+    Only the core Microsoft.SemanticKernel package is referenced here —
+    that's deliberate. It gives us Kernel, IChatCompletionService, and
+    ChatHistory, which is everything SabAgent needs to build a prompt and
+    parse a structured response, regardless of which model actually
+    answers it. A real connector package (e.g.
+    Microsoft.SemanticKernel.Connectors.OpenAI) plus a real API key is a
+    separate, later concern — wiring SabAgent up to an actual live model
+    needs Brock to supply real credentials, which don't belong hardcoded
+    here. See pre-development-checklist.md, PD-6.
 
     Hard boundary (Section 4.3): this project can only ever produce a
     proposed Plan. It must never reference SabEngine.Execution or call a
     module directly — that boundary is what keeps recommend-and-approve
     enforceable at the architecture level, not just a policy.
   -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SemanticKernel" Version="1.26.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\SabEngine.Core\SabEngine.Core.csproj" />
   </ItemGroup>
