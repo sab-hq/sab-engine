@@ -1,0 +1,88 @@
+name: CI
+
+# See pre-development-checklist.md, PD-10. Two jobs, split by OS
+# requirement rather than one job trying to satisfy both:
+#
+#   - test-cross-platform (ubuntu-latest): everything except the
+#     Windows-only Credential Manager tests (PD-9), using GitHub's
+#     native Postgres service container for the claim/lease concurrency
+#     tests (PD-5) — this combination is well-supported and reliable on
+#     Linux runners.
+#   - test-windows (windows-latest): the full SabEngine.Execution.Tests
+#     project, including WindowsCredentialManagerSecretStoreTests, which
+#     can only run on Windows at all (it P/Invokes advapi32.dll). This
+#     also re-verifies PowerShell interop specifically on Windows, which
+#     is sab-engine's actual real-world target OS.
+#
+# Deliberately NOT one Windows job running everything: GitHub-hosted
+# Windows runners running Linux Docker containers (needed for
+# docker-compose.yml's Postgres) has historically been a flaky
+# combination, not a reliable one — splitting by OS avoids relying on
+# that entirely.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-cross-platform:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: sabengine
+          POSTGRES_PASSWORD: sabengine_dev_only
+          POSTGRES_DB: postgres
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Test (excluding Windows-only Credential Manager tests)
+        run: dotnet test --no-build --filter "FullyQualifiedName!~WindowsCredentialManagerSecretStoreTests"
+        env:
+          # Matches the postgres service block above exactly — no
+          # SABENGINE_TEST_ADMIN_CONNECTIONSTRING override needed in
+          # practice, but set explicitly here for clarity.
+          SABENGINE_TEST_ADMIN_CONNECTIONSTRING: "Host=localhost;Port=5433;Database=postgres;Username=sabengine;Password=sabengine_dev_only"
+
+  test-windows:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore
+
+      - name: Test SabEngine.Execution.Tests (includes Windows Credential Manager tests)
+        run: dotnet test tests/SabEngine.Execution.Tests/SabEngine.Execution.Tests.csproj --no-build

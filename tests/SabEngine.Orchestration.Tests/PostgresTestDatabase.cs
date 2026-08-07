@@ -23,7 +23,16 @@ namespace SabEngine.Orchestration.Tests;
 /// </summary>
 public sealed class PostgresTestDatabase : IAsyncDisposable
 {
-    private const string AdminConnectionString = "Host=localhost;Port=5433;Database=postgres;Username=sabengine;Password=sabengine_dev_only";
+    // Local dev default matches docker-compose.yml exactly (port 5433,
+    // chosen to avoid colliding with a native Postgres install — see
+    // PD-3). CI overrides this via SABENGINE_TEST_ADMIN_CONNECTIONSTRING
+    // to point at whatever Postgres instance is actually available on
+    // the runner, the same override pattern SabEngineDbContextFactory
+    // already uses.
+    private static readonly string AdminConnectionString =
+        Environment.GetEnvironmentVariable("SABENGINE_TEST_ADMIN_CONNECTIONSTRING")
+        ?? "Host=localhost;Port=5433;Database=postgres;Username=sabengine;Password=sabengine_dev_only";
+
     private readonly string _databaseName = $"sabengine_test_{Guid.NewGuid():N}";
 
     public SabEngineDbContext Context { get; private set; } = null!;
