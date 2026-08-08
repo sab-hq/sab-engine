@@ -6,6 +6,17 @@
   -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <!--
+      NU1608 fires because we deliberately pin Microsoft.CodeAnalysis.Common
+      and Microsoft.CodeAnalysis.CSharp to 4.9.2 below — newer than what
+      EF Core Design's Workspaces package (4.5.0) technically declares it
+      wants. That pin is the actual fix for a real NU1107 version conflict
+      between Microsoft.PowerShell.SDK and EF Core Design (see PD-7 in
+      pre-development-checklist.md). NU1608 is just NuGet noting the pin
+      exists, not a real problem — safe to suppress here specifically,
+      not globally, so a genuine future NU1608 elsewhere still surfaces.
+    -->
+    <NoWarn>NU1608</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

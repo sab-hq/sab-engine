@@ -8,6 +8,8 @@
 
 A **module** is a single, reliable, reusable unit of work — one specific action SAB knows how to do (like "check if a server is healthy" or "apply a patch"), built so it can be trusted, reused, and safely undone if something goes wrong.
 
+> **Current status:** the manifest format this doc describes is now real, working code as of PD-12 in `pre-development-checklist.md` — `SabEngine.Modules` can read and validate a real module manifest, rejecting one that's missing a required field (like a rollback procedure) before it ever reaches the rest of the system. What's not built yet: the four actual patching modules this format is meant for (`pre-flight-check`, `stage-patches`, `apply-patches`, `validate` — PD-14–PD-17), and a real catalog loader that reads every manifest from the OSML automatically.
+
 ## The problem modules solve
 
 Think about all the individual little scripts a sysadmin ends up writing over the years — one to check disk space, one to restart a service, one to apply patches. They usually don't look anything alike: different naming, different error handling, some have a way to undo their changes and some really don't, some were written by someone who left the team two years ago and nobody's totally sure what they do anymore.

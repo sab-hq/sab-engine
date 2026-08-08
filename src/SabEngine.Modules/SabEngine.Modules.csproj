@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    SabEngine.Modules — reads and validates the module manifest format
+    from docs/design/SAB_Design_Document_v0.1.2.md, Section 4.2. This is
+    the OSML (`sab-hq/sab-modules`) side of the contract: real modules
+    live there as YAML manifest + script pairs, and this project is what
+    lets sab-engine actually understand one.
+
+    Lives in its own project (not Core) specifically because Core is
+    documented as dependency-free (see SabEngine.Core.csproj) — YamlDotNet
+    is a real external dependency, so it belongs here instead.
+
+    YamlDotNet version (16.2.1) is a best-effort guess from memory, same
+    risk category as the Semantic Kernel and PowerShell.SDK version
+    guesses in PD-6/PD-7 — flagged honestly in pre-development-checklist.md,
+    PD-12, before verification.
+  -->
+  <ItemGroup>
+    <PackageReference Include="YamlDotNet" Version="16.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SabEngine.Core\SabEngine.Core.csproj" />
+  </ItemGroup>
+</Project>
