@@ -64,7 +64,7 @@ Per the roadmap (`SAB_Design_Document_v0.1.2.md`, Section 9), Phase 1 doesn't ne
 - ⬜ The first real modules (`pre-flight-check`, `stage-patches`, `apply-patches`, `validate`) — not yet written (PD-14–PD-17)
 - ⬜ Wiring the agent to a real model (an actual OpenAI/Azure OpenAI connector + API key) — not yet done, needs a real credential from Brock
 - ⬜ The actual WinRM connector, combining PowerShell interop and the secrets store to reach a remote server — not yet built (PD-17–PD-20)
-- ⬜ A lab/low-stakes test environment to actually validate against — **plan decided (PD-11): a small Azure B1s Windows Server VM, deallocated between test sessions to keep cost near $3–$8/month**, but not yet created — pinned by Brock for later
+- ✅ A lab/low-stakes Windows Server VM in Azure (`sabengine-labwin01`), confirmed reachable and properly deallocated between sessions with a budget alert in place — ready for PD-19+ connector/module testing once that work starts
 
 `pre-development-checklist.md` is the authoritative, up-to-date tracker for exactly where this stands — this section is a summary, not the source of truth.
 
