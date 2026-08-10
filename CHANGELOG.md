@@ -18,6 +18,7 @@ All notable changes to `sab-engine` are recorded here, in the order they happene
 - **PD-12** — `SabEngine.Modules`, the module manifest parser, matching Section 4.2's YAML schema.
 - **PD-13** — `SabEngine.Modules.Cli`, a validator CLI, plus a CI pipeline in `sab-modules` that checks out this repo and runs it on every push.
 - **PD-14** — `pre-flight-check`, the first real SAB module (in `sab-modules`), with 8 passing Pester tests.
+- **PD-15** — `stage-patches`, the second module (in `sab-modules`), downloading Windows updates via the native WUA COM API, with 5 passing Pester tests.
 - **PD-30** — A real human approval web UI in `SabEngine.Api` — the actual, working implementation of recommend-and-approve mode (Section 2), not a mockup.
 
 ### Fixed
@@ -27,6 +28,7 @@ All notable changes to `sab-engine` are recorded here, in the order they happene
 - **PD-7** — A `Microsoft.CodeAnalysis` version conflict between `Microsoft.PowerShell.SDK` and EF Core Design; PowerShell's `throw` (terminating error) wasn't being caught the way `Write-Error` (non-terminating) already was.
 - **PD-11** — B-series Azure VM sizes returned `NotAvailableForSubscription` in two regions; used D2s_v3 instead, at meaningfully higher cost if left running.
 - **PD-12** — The design doc's own Section 4.2 YAML example, `{ type: enum[success, failure] }`, wasn't actually valid YAML inside a flow mapping; fixed in both the doc and the parser's test fixture.
+- **PD-15** — Two subtle test-only bugs: helper fake-object functions defined outside any Pester block weren't reliably visible in `It`/`BeforeEach` scope under Pester v6 (fixed by moving them into `BeforeAll`); a mocked function returning an *empty* `ArrayList` silently unrolled to zero pipeline output items, since `ArrayList` implements `IEnumerable` (fixed with `Write-Output -NoEnumerate`).
 - **PD-30** — `Microsoft.NET.Sdk.Web` auto-including `appsettings.json`, duplicating an explicit `<Content>` block left over from the old `Sdk`; CSS blocks using the wrong brace-escaping convention for interpolated raw string literals (`CS9006`).
 
 ### Changed

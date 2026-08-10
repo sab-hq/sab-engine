@@ -64,7 +64,7 @@
 
 Per the roadmap (`SAB_Design_Document_v0.1.2.md`, Section 9), Phase 1 doesn't need the full vision of this repo — just enough to prove the architecture end-to-end on Windows Server patching. Real progress so far:
 - ✅ Solution scaffold, database schema, a production-quality state machine with a real audit trail, multi-worker-safe concurrency (claim/lease), a real Semantic-Kernel-backed AI agent with hard-rule enforcement, working local PowerShell interop, a real Windows Credential Manager-backed secrets store, a working two-job CI pipeline (Linux + Windows, both verified green), a real module manifest parser, a validator CLI feeding `sab-modules`' own CI, and a real, working human approval web UI (PD-30) — further along than "minimum viable" already, not a stripped-down placeholder
-- 🟡 The first real module, `pre-flight-check`, is written, tested, and confirmed valid against the real parser (PD-14) — `stage-patches`, `apply-patches`, and `validate` still ahead (PD-15–PD-17)
+- 🟡 Two of the four real modules are done: `pre-flight-check` (PD-14) and `stage-patches` (PD-15), both written, tested, and confirmed valid against the real parser — `apply-patches` and `validate` still ahead (PD-16–PD-17)
 - ⬜ Wiring the agent to a real model (an actual OpenAI/Azure OpenAI connector + API key) — not yet done, needs a real credential from Brock
 - ⬜ The actual WinRM connector, combining PowerShell interop and the secrets store to reach a remote server — not yet built (PD-17–PD-20)
 - ✅ A lab/low-stakes Windows Server VM in Azure (`sabengine-labwin01`), confirmed reachable and properly deallocated between sessions with a budget alert in place — ready for PD-19+ connector/module testing once that work starts
