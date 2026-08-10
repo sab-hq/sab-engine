@@ -24,6 +24,7 @@ Plain-language guides to the core concepts — no prior context needed:
 ## Before development starts
 
 - [**Pre-development checklist**](docs/pre-development-checklist.md) — living tracker of what's left to do before writing code, with unique IDs and status
+- [**Changelog**](CHANGELOG.md) — short, scannable record of what's actually shipped, in order
 
 ## Build phases
 

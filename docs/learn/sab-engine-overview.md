@@ -1,7 +1,7 @@
 # sab-engine
 ### `github.com/sab-hq/sab-engine` — Core Orchestration Engine
 
-**Status:** Actively being built. The repo exists, the solution scaffold is real and builds cleanly, and Phase 1 development is underway — see `pre-development-checklist.md` for the authoritative, item-by-item build tracker (PD-1 through PD-29). This document consolidates everything decided about this repo across the design doc and open-questions tracker into a single reference; `pre-development-checklist.md` is the one to check for "what's actually built right now."
+**Status:** Actively being built. The repo exists, the solution scaffold is real and builds cleanly, and Phase 1 development is underway — see `pre-development-checklist.md` for the authoritative, item-by-item build tracker (PD-1 through PD-30). This document consolidates everything decided about this repo across the design doc and open-questions tracker into a single reference; `pre-development-checklist.md` is the one to check for "what's actually built right now."
 
 ---
 
@@ -51,7 +51,8 @@
 - **The actual WinRM connector — not yet built (PD-17–PD-20).** `PowerShellExecutor` and `WindowsCredentialManagerSecretStore` are both interop primitives the connector will use together; neither is wired into an `IExecutionConnector` implementation yet, and neither points at a *remote* session/target. Building that is still ahead.
 
 ### 5. CLI / API
-- `SabEngine.Api` exists as the composition root and currently just registers the database connection via DI (PD-3). Real CLI/API surface design is still open (AR-4, deferred to Phase 3/4 per the roadmap).
+- **A real human approval UI — done (PD-30).** `SabEngine.Api` is now a working ASP.NET Core web app (switched from a plain console `Sdk` to `Microsoft.NET.Sdk.Web`), serving plain server-rendered HTML with no JavaScript framework or build step — matching the same lightweight philosophy `sab-kb`'s own UI already uses. A pending-approvals list, a review page showing the plan's steps and the agent's reasoning, and Approve/Decline buttons that genuinely drive `WorkflowRunStateMachine` and record a real `Approval` row. This is the human-facing half of recommend-and-approve mode (Section 2) made real — not a mockup. A `POST /demo/create` route seeds an obviously-labeled demo run for testing, since the orchestration engine doesn't yet call modules in sequence to create a real one.
+- **A broader CLI/API surface — still open (AR-4), correctly deferred to Phase 3/4** per the roadmap. PD-30 covers the minimum needed for a human to approve a plan; a fuller API (for external tools, ChatOps, etc.) is separate, later scope.
 
 ## What Does *Not* Live Here
 
@@ -62,7 +63,7 @@
 ## Phase 1 Scope (Minimum Viable Version)
 
 Per the roadmap (`SAB_Design_Document_v0.1.2.md`, Section 9), Phase 1 doesn't need the full vision of this repo — just enough to prove the architecture end-to-end on Windows Server patching. Real progress so far:
-- ✅ Solution scaffold, database schema, a production-quality state machine with a real audit trail, multi-worker-safe concurrency (claim/lease), a real Semantic-Kernel-backed AI agent with hard-rule enforcement, working local PowerShell interop, a real Windows Credential Manager-backed secrets store, a working two-job CI pipeline (Linux + Windows, both verified green), a real module manifest parser, and a validator CLI feeding `sab-modules`' own CI — further along than "minimum viable" already, not a stripped-down placeholder
+- ✅ Solution scaffold, database schema, a production-quality state machine with a real audit trail, multi-worker-safe concurrency (claim/lease), a real Semantic-Kernel-backed AI agent with hard-rule enforcement, working local PowerShell interop, a real Windows Credential Manager-backed secrets store, a working two-job CI pipeline (Linux + Windows, both verified green), a real module manifest parser, a validator CLI feeding `sab-modules`' own CI, and a real, working human approval web UI (PD-30) — further along than "minimum viable" already, not a stripped-down placeholder
 - 🟡 The first real module, `pre-flight-check`, is written, tested, and confirmed valid against the real parser (PD-14) — `stage-patches`, `apply-patches`, and `validate` still ahead (PD-15–PD-17)
 - ⬜ Wiring the agent to a real model (an actual OpenAI/Azure OpenAI connector + API key) — not yet done, needs a real credential from Brock
 - ⬜ The actual WinRM connector, combining PowerShell interop and the secrets store to reach a remote server — not yet built (PD-17–PD-20)

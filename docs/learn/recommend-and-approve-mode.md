@@ -8,6 +8,8 @@
 
 **Recommend-and-approve mode** means SAB's AI agent never runs anything against your infrastructure on its own — it proposes a plan and explains its reasoning, and a human has to say yes before anything actually happens.
 
+> **Current status:** this is no longer just a principle — as of PD-30 in `pre-development-checklist.md`, there's a real, working web page (`sab-engine`'s `SabEngine.Api`, running at `http://localhost:5000` locally) where a human actually sees a proposed plan and clicks Approve or Decline. That click genuinely drives the state machine and records who decided, exactly as this doc describes. Not yet done: a real workflow trigger that creates a genuine plan (today's page includes an obviously-labeled "create a demo run" button for testing, since the orchestration engine doesn't call modules in sequence yet), and any SAB-KB context showing up alongside the agent's reasoning — both real, open next steps.
+
 ## The problem it solves
 
 Handing an AI agent the ability to make changes to real servers is genuinely useful — but it's also genuinely risky if it's trusted too early. This isn't a hypothetical worry: there are real, documented cases of AI agents causing serious, irreversible damage to production infrastructure — including deleting production databases along with their backups — when they were given too much autonomy before they'd earned it.

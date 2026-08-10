@@ -1,11 +1,17 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <!--
-    SabEngine.Api — the CLI/API entry point (design doc, Section 4.1,
-    "CLI/API to trigger and monitor workflows"). This is the composition
-    root: the only project allowed to reference all five of the others.
+    SabEngine.Api — the composition root, now also the minimal
+    human-approval web UI. This is a real gap the original PD-1–PD-29
+    checklist never itemized: the state machine enforces that a human
+    must approve a plan, but nothing existed yet for a human to actually
+    look at. See pre-development-checklist.md, PD-30.
+
+    Switched from Microsoft.NET.Sdk to Microsoft.NET.Sdk.Web to get
+    Kestrel/ASP.NET Core web hosting (WebApplication.CreateBuilder)
+    without adding packages by hand — the Web SDK brings the shared
+    ASP.NET Core framework reference implicitly.
   -->
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
     <!--
       NU1608 fires because we deliberately pin Microsoft.CodeAnalysis.Common
       and Microsoft.CodeAnalysis.CSharp to 4.9.2 below — newer than what
@@ -20,21 +26,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <!--
-      Forces a single resolved version of Microsoft.CodeAnalysis.Common
-      and Microsoft.CodeAnalysis.CSharp across the dependency graph.
-      Without these, NuGet can't reconcile the versions EF Core Design's
-      Workspaces needs against the versions Microsoft.PowerShell.SDK (via
-      SabEngine.Execution) needs — error NU1107, one level at a time.
-      NuGet's own error messages suggested exactly this fix each time.
-      See pre-development-checklist.md, PD-7.
-    -->
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.9.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.9.2" />
   </ItemGroup>
@@ -45,11 +41,5 @@
     <ProjectReference Include="..\SabEngine.Orchestration\SabEngine.Orchestration.csproj" />
     <ProjectReference Include="..\SabEngine.Agent\SabEngine.Agent.csproj" />
     <ProjectReference Include="..\SabEngine.Execution\SabEngine.Execution.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 </Project>
