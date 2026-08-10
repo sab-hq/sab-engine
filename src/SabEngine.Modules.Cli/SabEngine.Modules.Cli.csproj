@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    SabEngine.Modules.Cli — a thin console wrapper around
+    SabEngine.Modules (PD-12), built specifically so `sab-modules`' own
+    CI (PD-13) can validate every module manifest against the real
+    parser without duplicating any validation logic. See
+    pre-development-checklist.md, PD-13, for the cross-repo approach
+    this enables (and why it's a deliberate Phase 1 simplification, not
+    the eventual ideal).
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SabEngine.Modules\SabEngine.Modules.csproj" />
+  </ItemGroup>
+</Project>
