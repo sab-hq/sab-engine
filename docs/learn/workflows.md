@@ -8,6 +8,8 @@
 
 A **workflow** is a saved, repeatable recipe for getting a real sysadmin job done — the ordered set of steps SAB runs, in the right order, to accomplish something like "patch this server," the same reliable way every time.
 
+> **Current status:** all four ingredients this recipe needs are done and tested as of `pre-development-checklist.md`, PD-17 — `pre-flight-check`, `stage-patches`, `apply-patches`, and `validate` all exist as real, working modules. The actual "Patch Windows Server" workflow definition described below — stringing those four together in order — is next (PD-21), not yet written.
+
 ## The problem workflows solve
 
 If you've ever patched a Windows Server by hand, you already know the "recipe" in your head, even if you've never written it down:

@@ -64,10 +64,10 @@
 
 Per the roadmap (`SAB_Design_Document_v0.1.2.md`, Section 9), Phase 1 doesn't need the full vision of this repo — just enough to prove the architecture end-to-end on Windows Server patching. Real progress so far:
 - ✅ Solution scaffold, database schema, a production-quality state machine with a real audit trail, multi-worker-safe concurrency (claim/lease), a real Semantic-Kernel-backed AI agent with hard-rule enforcement, working local PowerShell interop, a real Windows Credential Manager-backed secrets store, a working two-job CI pipeline (Linux + Windows, both verified green), a real module manifest parser, a validator CLI feeding `sab-modules`' own CI, and a real, working human approval web UI (PD-30) — further along than "minimum viable" already, not a stripped-down placeholder
-- 🟡 Three of the four real modules are done: `pre-flight-check` (PD-14), `stage-patches` (PD-15), and `apply-patches` (PD-16) — all written, tested, and confirmed valid against the real parser. `apply-patches` is also the first module with a genuine, non-trivial rollback (real patch uninstall via `wusa.exe`), unlike the justified no-ops the other two got. `validate` is the last one still ahead (PD-17)
+- ✅ All four real modules are done: `pre-flight-check` (PD-14), `stage-patches` (PD-15), `apply-patches` (PD-16), and `validate` (PD-17) — written, tested (29 tests total across the set), and confirmed valid against the real parser (`4/4 manifest(s) valid`). `apply-patches` is also the first module with a genuine, non-trivial rollback (real patch uninstall via `wusa.exe`), unlike the justified no-ops the other three got. The actual "Patch Windows Server" workflow stringing all four together is next (PD-21)
 - ⬜ Wiring the agent to a real model (an actual OpenAI/Azure OpenAI connector + API key) — not yet done, needs a real credential from Brock
-- ⬜ The actual WinRM connector, combining PowerShell interop and the secrets store to reach a remote server — not yet built (PD-17–PD-20)
-- ✅ A lab/low-stakes Windows Server VM in Azure (`sabengine-labwin01`), confirmed reachable and properly deallocated between sessions with a budget alert in place — ready for PD-19+ connector/module testing once that work starts
+- ⬜ The actual WinRM connector, combining PowerShell interop and the secrets store to reach a remote server — not yet built (PD-23–PD-27)
+- ✅ A lab/low-stakes Windows Server VM in Azure (`sabengine-labwin01`), confirmed reachable and properly deallocated between sessions with a budget alert in place — ready for PD-23+ connector/module testing once that work starts
 
 `pre-development-checklist.md` is the authoritative, up-to-date tracker for exactly where this stands — this section is a summary, not the source of truth.
 

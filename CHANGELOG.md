@@ -20,6 +20,7 @@ All notable changes to `sab-engine` are recorded here, in the order they happene
 - **PD-14** — `pre-flight-check`, the first real SAB module (in `sab-modules`), with 8 passing Pester tests.
 - **PD-15** — `stage-patches`, the second module (in `sab-modules`), downloading Windows updates via the native WUA COM API, with 5 passing Pester tests.
 - **PD-16** — `apply-patches`, the third module (in `sab-modules`), installing staged Windows updates via the native WUA COM API, with a genuine, non-trivial rollback (`wusa.exe /uninstall`) and 10 passing Pester tests. Also closes out PD-18 (rollback procedures for `stage-patches`/`apply-patches`).
+- **PD-17** — `validate`, the fourth and final module (in `sab-modules`), confirming specific patches actually installed and the server is still healthy afterward, with 6 passing Pester tests. Also closes out PD-19 (unique IDs/`lab-validated` status) and PD-20 (`tests.lab_suite` files) for all four modules — both were satisfied as each module was written, not separate work. All four patching modules now exist, tested (29 tests total), and verified.
 - **PD-30** — A real human approval web UI in `SabEngine.Api` — the actual, working implementation of recommend-and-approve mode (Section 2), not a mockup.
 
 ### Fixed
