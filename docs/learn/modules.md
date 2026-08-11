@@ -8,7 +8,7 @@
 
 A **module** is a single, reliable, reusable unit of work — one specific action SAB knows how to do (like "check if a server is healthy" or "apply a patch"), built so it can be trusted, reused, and safely undone if something goes wrong.
 
-> **Current status:** the manifest format this doc describes is now real, working code as of PD-12 in `pre-development-checklist.md` — `SabEngine.Modules` can read and validate a real module manifest, rejecting one that's missing a required field (like a rollback procedure) before it ever reaches the rest of the system. Two real modules exist now: `pre-flight-check` (PD-14) and `stage-patches` (PD-15), both written, tested, and confirmed valid against that parser — `apply-patches` and `validate` are still ahead (PD-16–PD-17). A CI pipeline in the `sab-modules` repo now validates every module manifest automatically on every push (PD-13). What's not built yet: a real catalog loader that reads every manifest from the OSML automatically and feeds the AI agent's available-module list.
+> **Current status:** the manifest format this doc describes is now real, working code as of PD-12 in `pre-development-checklist.md` — `SabEngine.Modules` can read and validate a real module manifest, rejecting one that's missing a required field (like a rollback procedure) before it ever reaches the rest of the system. Three of the four real modules are done: `pre-flight-check` (PD-14), `stage-patches` (PD-15), and `apply-patches` (PD-16), all written, tested, and confirmed valid against that parser — `validate` is the last one still ahead (PD-17). `apply-patches` is also the first module with a genuine, non-trivial rollback (actually uninstalling a patch) rather than the justified no-op the two read/download-only modules got — see the table in "A concrete example" below for how that distinction plays out across all four modules. A CI pipeline in the `sab-modules` repo now validates every module manifest automatically on every push (PD-13). What's not built yet: a real catalog loader that reads every manifest from the OSML automatically and feeds the AI agent's available-module list.
 
 ## The problem modules solve
 
@@ -38,8 +38,8 @@ Here's what the patching workflow from `workflows.md` looks like broken down int
 | Module | What it does | What its rollback looks like |
 |---|---|---|
 | `pre-flight-check` | Confirms the server is healthy enough to safely patch right now | N/A — it only *checks*, it doesn't change anything |
-| `stage-patches` | Downloads and prepares the patches | Delete the staged files, no server changes made yet |
-| `apply-patches` | Actually installs the patches | Uninstall the specific patches that were applied |
+| `stage-patches` | Downloads and prepares the patches | N/A — downloading doesn't change the server's running behavior, so there's nothing that urgently needs undoing |
+| `apply-patches` | Actually installs the patches | Uninstall the specific patches that were applied — a real, tested rollback, not a no-op |
 | `validate` | Confirms the server came back up correctly after patching | N/A — it only *checks*, it doesn't change anything |
 
 Notice that `pre-flight-check` and `validate` don't need a "real" rollback, because they never change anything — they just look and report. That's fine; the rollback requirement is about *reversibility of change*, not about every module needing an undo button for the sake of it.

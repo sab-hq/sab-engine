@@ -19,6 +19,7 @@ All notable changes to `sab-engine` are recorded here, in the order they happene
 - **PD-13** — `SabEngine.Modules.Cli`, a validator CLI, plus a CI pipeline in `sab-modules` that checks out this repo and runs it on every push.
 - **PD-14** — `pre-flight-check`, the first real SAB module (in `sab-modules`), with 8 passing Pester tests.
 - **PD-15** — `stage-patches`, the second module (in `sab-modules`), downloading Windows updates via the native WUA COM API, with 5 passing Pester tests.
+- **PD-16** — `apply-patches`, the third module (in `sab-modules`), installing staged Windows updates via the native WUA COM API, with a genuine, non-trivial rollback (`wusa.exe /uninstall`) and 10 passing Pester tests. Also closes out PD-18 (rollback procedures for `stage-patches`/`apply-patches`).
 - **PD-30** — A real human approval web UI in `SabEngine.Api` — the actual, working implementation of recommend-and-approve mode (Section 2), not a mockup.
 
 ### Fixed
@@ -29,6 +30,7 @@ All notable changes to `sab-engine` are recorded here, in the order they happene
 - **PD-11** — B-series Azure VM sizes returned `NotAvailableForSubscription` in two regions; used D2s_v3 instead, at meaningfully higher cost if left running.
 - **PD-12** — The design doc's own Section 4.2 YAML example, `{ type: enum[success, failure] }`, wasn't actually valid YAML inside a flow mapping; fixed in both the doc and the parser's test fixture.
 - **PD-15** — Two subtle test-only bugs: helper fake-object functions defined outside any Pester block weren't reliably visible in `It`/`BeforeEach` scope under Pester v6 (fixed by moving them into `BeforeAll`); a mocked function returning an *empty* `ArrayList` silently unrolled to zero pipeline output items, since `ArrayList` implements `IEnumerable` (fixed with `Write-Output -NoEnumerate`).
+- **PD-16** — One invalid Pester assertion (`Should-Not`, not real syntax) caught and removed during self-review, before it ever reached Brock. Applying the `-NoEnumerate` lesson from PD-15 proactively meant no repeat of that bug.
 - **PD-30** — `Microsoft.NET.Sdk.Web` auto-including `appsettings.json`, duplicating an explicit `<Content>` block left over from the old `Sdk`; CSS blocks using the wrong brace-escaping convention for interpolated raw string literals (`CS9006`).
 
 ### Changed
