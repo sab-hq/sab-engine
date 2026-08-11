@@ -28,5 +28,14 @@ public interface IExecutionConnector
 
 public interface IExecutionSession : IAsyncDisposable
 {
-    Task<ExecutionResult> ExecuteAsync(string moduleId, IReadOnlyDictionary<string, object?> parameters, CancellationToken cancellationToken = default);
+    /// <summary>
+    /// <paramref name="workflowRunId"/> was missing from this signature
+    /// until PD-23 — a real gap found while actually building the first
+    /// implementation of this interface: <see cref="ExecutionResult"/>
+    /// requires a <c>WorkflowRunId</c>, but there was previously no way
+    /// for a caller to supply one. Fixed here rather than worked around,
+    /// since every future connector implementation needs this too, not
+    /// just the WinRM one.
+    /// </summary>
+    Task<ExecutionResult> ExecuteAsync(Guid workflowRunId, string moduleId, IReadOnlyDictionary<string, object?> parameters, CancellationToken cancellationToken = default);
 }

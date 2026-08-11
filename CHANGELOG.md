@@ -21,6 +21,8 @@ All notable changes to `sab-engine` are recorded here, in the order they happene
 - **PD-15** — `stage-patches`, the second module (in `sab-modules`), downloading Windows updates via the native WUA COM API, with 5 passing Pester tests.
 - **PD-16** — `apply-patches`, the third module (in `sab-modules`), installing staged Windows updates via the native WUA COM API, with a genuine, non-trivial rollback (`wusa.exe /uninstall`) and 10 passing Pester tests. Also closes out PD-18 (rollback procedures for `stage-patches`/`apply-patches`).
 - **PD-17** — `validate`, the fourth and final module (in `sab-modules`), confirming specific patches actually installed and the server is still healthy afterward, with 6 passing Pester tests. Also closes out PD-19 (unique IDs/`lab-validated` status) and PD-20 (`tests.lab_suite` files) for all four modules — both were satisfied as each module was written, not separate work. All four patching modules now exist, tested (29 tests total), and verified.
+- **PD-21** — `patch-windows-server`, the first real workflow definition (in `sab-modules`), stringing all four modules together in order. Also closes out PD-22 (its unique ID). No formal schema or validator exists for workflow definitions yet, unlike modules — a real, flagged gap.
+- **PD-23** — `WinRmExecutionConnector`/`WinRmExecutionSession`, the first real `IExecutionConnector` implementation — resolves a credential, opens a real WinRM/PowerShell-remoting session, runs a module script against it, and returns a structured result. Also closes out PD-24 (credential resolution at connection time). Verified with 55/55 tests passing, using an injectable seam that substitutes a real local PowerShell session for testing.
 - **PD-30** — A real human approval web UI in `SabEngine.Api` — the actual, working implementation of recommend-and-approve mode (Section 2), not a mockup.
 
 ### Fixed
@@ -32,6 +34,7 @@ All notable changes to `sab-engine` are recorded here, in the order they happene
 - **PD-12** — The design doc's own Section 4.2 YAML example, `{ type: enum[success, failure] }`, wasn't actually valid YAML inside a flow mapping; fixed in both the doc and the parser's test fixture.
 - **PD-15** — Two subtle test-only bugs: helper fake-object functions defined outside any Pester block weren't reliably visible in `It`/`BeforeEach` scope under Pester v6 (fixed by moving them into `BeforeAll`); a mocked function returning an *empty* `ArrayList` silently unrolled to zero pipeline output items, since `ArrayList` implements `IEnumerable` (fixed with `Write-Output -NoEnumerate`).
 - **PD-16** — One invalid Pester assertion (`Should-Not`, not real syntax) caught and removed during self-review, before it ever reached Brock. Applying the `-NoEnumerate` lesson from PD-15 proactively meant no repeat of that bug.
+- **PD-23** — A real bug in `IExecutionSession`'s interface itself (Core, from PD-2): `ExecuteAsync` had no way to receive a `WorkflowRunId`, even though its own return type requires one — fixed at the interface level, not worked around locally.
 - **PD-30** — `Microsoft.NET.Sdk.Web` auto-including `appsettings.json`, duplicating an explicit `<Content>` block left over from the old `Sdk`; CSS blocks using the wrong brace-escaping convention for interpolated raw string literals (`CS9006`).
 
 ### Changed
