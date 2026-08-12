@@ -29,13 +29,21 @@ namespace SabEngine.Execution;
 /// everything downstream of "a runspace exists" — script resolution,
 /// parameter passing, result construction, error handling — using a
 /// real LOCAL runspace as a substitute, injected via openRunspace.
+///
+/// executionTimeout (PD-26) is passed through to every session this
+/// connector creates — see WinRmExecutionSession for what it actually
+/// guarantees (per-target isolation: a hang against one target gets
+/// forcibly stopped rather than blocking indefinitely, and never starves
+/// the shared thread pool other targets' executions might depend on).
 /// </summary>
 public sealed class WinRmExecutionConnector(
     ISecretStore secretStore,
     string modulesRootPath,
-    Func<string, PSCredential, Runspace>? openRunspace = null) : IExecutionConnector
+    Func<string, PSCredential, Runspace>? openRunspace = null,
+    TimeSpan? executionTimeout = null) : IExecutionConnector
 {
     private readonly Func<string, PSCredential, Runspace> _openRunspace = openRunspace ?? DefaultOpenRunspace;
+    private readonly TimeSpan _executionTimeout = executionTimeout ?? TimeSpan.FromMinutes(10);
 
     public async Task<IExecutionSession> ConnectAsync(string target, string credentialHandle, CancellationToken cancellationToken = default)
     {
@@ -54,7 +62,7 @@ public sealed class WinRmExecutionConnector(
 
         var runspace = await Task.Run(() => _openRunspace(target, psCredential), cancellationToken);
 
-        return new WinRmExecutionSession(runspace, modulesRootPath);
+        return new WinRmExecutionSession(runspace, modulesRootPath, _executionTimeout);
     }
 
     public async Task<bool> HealthCheckAsync(string target, CancellationToken cancellationToken = default)

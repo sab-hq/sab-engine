@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Management.Automation.Runspaces;
 using SabEngine.Execution;
 using Xunit;
@@ -145,5 +146,65 @@ public sealed class WinRmExecutionConnectorTests : IDisposable
         var reachable = await sut.HealthCheckAsync("240.0.0.1");
 
         Assert.False(reachable);
+    }
+
+    [Fact]
+    public async Task A_hanging_script_times_out_and_is_forcibly_stopped_rather_than_blocking_forever()
+    {
+        // PD-26: the actual isolation guarantee — an enforced timeout
+        // calls ps.Stop() to interrupt a hung pipeline. If this fails,
+        // it fails by the test itself hanging, not by a normal assertion
+        // failure — worth knowing if this test ever needs debugging.
+        WriteTestModule("hanging-module", "Start-Sleep -Seconds 9999");
+
+        var secretStore = new FakeSecretStore();
+        await secretStore.SetSecretAsync("h", new StoredCredential("user", "pass").ToJson());
+        var connector = new WinRmExecutionConnector(secretStore, _modulesRoot, OpenLocalRunspaceForTesting, executionTimeout: TimeSpan.FromSeconds(2));
+        await using var session = await connector.ConnectAsync("target", "h");
+
+        var stopwatch = Stopwatch.StartNew();
+        var result = await session.ExecuteAsync(Guid.NewGuid(), "hanging-module", new Dictionary<string, object?>());
+        stopwatch.Stop();
+
+        Assert.False(result.Succeeded);
+        Assert.Contains("timed out", result.Output, StringComparison.OrdinalIgnoreCase);
+        Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(15), $"Expected the 2-second timeout to fire promptly; took {stopwatch.Elapsed}.");
+    }
+
+    [Fact]
+    public async Task A_hang_on_one_target_does_not_delay_execution_against_a_different_target()
+    {
+        // The actual PD-26 requirement, proven directly: run a hanging
+        // execution and a fast one concurrently, against two separate
+        // sessions (two separate targets), and confirm the fast one
+        // finishes quickly regardless of the slow one's state. This is
+        // deliberately a long timeout on the hanging one — the point is
+        // that the FAST session is never blocked by it at all, not that
+        // the slow one eventually times out.
+        WriteTestModule("hanging-module", "Start-Sleep -Seconds 9999");
+        WriteTestModule("fast-module", "Write-Output 'done fast'");
+
+        var secretStore = new FakeSecretStore();
+        await secretStore.SetSecretAsync("h", new StoredCredential("user", "pass").ToJson());
+
+        var slowConnector = new WinRmExecutionConnector(secretStore, _modulesRoot, OpenLocalRunspaceForTesting, executionTimeout: TimeSpan.FromMinutes(10));
+        var fastConnector = new WinRmExecutionConnector(secretStore, _modulesRoot, OpenLocalRunspaceForTesting, executionTimeout: TimeSpan.FromMinutes(10));
+
+        await using var slowSession = await slowConnector.ConnectAsync("target-slow", "h");
+        await using var fastSession = await fastConnector.ConnectAsync("target-fast", "h");
+
+        // Deliberately not awaited to completion — we don't need the
+        // hang to resolve to prove the fast target isn't blocked by it.
+        var slowTask = slowSession.ExecuteAsync(Guid.NewGuid(), "hanging-module", new Dictionary<string, object?>());
+
+        var stopwatch = Stopwatch.StartNew();
+        var fastResult = await fastSession.ExecuteAsync(Guid.NewGuid(), "fast-module", new Dictionary<string, object?>());
+        stopwatch.Stop();
+
+        Assert.True(fastResult.Succeeded);
+        Assert.Contains("done fast", fastResult.Output);
+        Assert.True(stopwatch.Elapsed < TimeSpan.FromSeconds(10), $"The fast target took {stopwatch.Elapsed} — isolation may be broken; it should never wait on the slow target's hang.");
+
+        _ = slowTask; // deliberately not awaited — see comment above
     }
 }
