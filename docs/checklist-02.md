@@ -16,8 +16,7 @@
 
 | ID | Item | Why it's here / depends on | Status |
 |---|---|---|---|
-
-*(No items yet — this table fills in as new work surfaces after `pre-development-checklist.md`'s PD-1 through PD-30. First new item here should be PD-31.)*
+| PD-31 | Wire `CredentialHandleResolver` (PD-25) into per-module execution — each module in a workflow resolves its own appropriately-scoped credential and opens its own connection, instead of one connection/credential covering an entire workflow run | Depends on the orchestration engine actually calling modules in sequence, per a workflow definition — a gap flagged since PD-4 and still open. `CredentialHandleResolver` itself is real and tested (PD-25); nothing calls it per-module yet. | ⬜ Not Started |
 
 ---
 
