@@ -72,6 +72,8 @@ A couple of specific engineering choices about the orchestration engine are wort
 - **`recommend-and-approve-mode.md`** — what happens right *before* the orchestration engine gets involved; read this if you want to understand where an approved plan actually comes from.
 - **`modules.md`** — the individual steps the orchestration engine calls, one at a time, as it works through a workflow.
 - **`workflows.md`** — the recipe the orchestration engine is following, and how it's structured.
+- **`crash-recovery.md`** — what happens when a workflow run gets interrupted, and how SAB decides what to do next.
+- **`rollback-scoping.md`** — once a rollback is needed, exactly how SAB decides what to undo.
 - **`SAB_Design_Document_v0.1.2.md`, Section 4.1** — the technical version of everything above, including the exact state machine (`Requested → PlanDrafted → PendingApproval → Approved → Executing → Completed/Failed → RolledBack`) a workflow run actually moves through.
 
 ---
