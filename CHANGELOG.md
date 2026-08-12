@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `sab-engine` are recorded here, in the order they happened — short and scannable on purpose. For full technical detail, exact test counts, and the real bugs found along the way, see `docs/pre-development-checklist.md`; this file is the summary, that file is the source of truth.
+All notable changes to `sab-engine` are recorded here, in the order they happened — short and scannable on purpose. For full technical detail, exact test counts, and the real bugs found along the way, see `docs/pre-development-checklist.md` (closed, historical record of PD-1–PD-27/PD-30) and `docs/checklist-02.md` (active tracker for everything since); this file is the summary, those are the source of truth.
 
 ## [Unreleased] — Phase 1 development
 
@@ -25,6 +25,7 @@ All notable changes to `sab-engine` are recorded here, in the order they happene
 - **PD-23** — `WinRmExecutionConnector`/`WinRmExecutionSession`, the first real `IExecutionConnector` implementation — resolves a credential, opens a real WinRM/PowerShell-remoting session, runs a module script against it, and returns a structured result. Also closes out PD-24 (credential resolution at connection time). Verified with 55/55 tests passing, using an injectable seam that substitutes a real local PowerShell session for testing.
 - **PD-25** — `CredentialHandleResolver`, a real least-privilege credential convention: a tier-specific handle (`"target:elevated"`) is tried first, falling back to a bare `"target"` handle if nothing tier-specific is registered. Verified clean on the first attempt, 59/59 tests total. Nothing calls this per-module yet — that wiring is tracked separately as PD-31 in `checklist-02.md`, since it depends on orchestration engine work that doesn't exist yet.
 - **PD-26** — Per-target connection isolation: the blocking PowerShell invocation now runs on a dedicated thread rather than the shared pool, and a configurable timeout (default 10 minutes) calls PowerShell's `Stop()` — used here for the first time — to forcibly interrupt a hung pipeline rather than let it block indefinitely. Verified directly with a real concurrent test (a hanging execution against one target never delays a fast one against another), 61/61 tests total.
+- **PD-27** — `DockerSandboxedExecutor`, real module sandboxing via disposable, network-isolated, read-only-mounted containers (`--network none` and a read-only mount, both directly tested). Real, flagged limitation: SAB's actual four modules are Windows-specific and don't run inside the default Linux container this uses — sandboxing them for real needs a Windows container image, a deliberate future step. CI proactively updated to exclude these tests from the Windows job. 66/66 tests total.
 - **PD-30** — A real human approval web UI in `SabEngine.Api` — the actual, working implementation of recommend-and-approve mode (Section 2), not a mockup.
 
 ### Fixed
@@ -44,3 +45,4 @@ All notable changes to `sab-engine` are recorded here, in the order they happene
 - Confirmed "OSML" and "ESS" as official shorthand for the module library and Engine State Store, respectively.
 - Confirmed Docker containers as the module sandboxing mechanism (SE-2) and Windows Credential Manager as the Phase 1 secrets backend (SE-1).
 - Added `checklist-02.md`, a continuation of `pre-development-checklist.md` for anything surfacing after PD-30 (starting at PD-31) — keeps the original checklist from growing indefinitely.
+- **Clean break: `pre-development-checklist.md` closed as a historical record; `checklist-02.md` is now the sole active tracker.** PD-28 and PD-29 (both `Not Started`) moved over with their IDs unchanged, along with the previously-deferred items table (AR-4, SC-1/2, PR-1/2, MP-1, SE-3) and every open thread flagged in the closed checklist's entries (the untested WinRM network path, `CredentialHandleResolver`'s per-module wiring, Docker sandboxing's Windows-container gap, the still-stub `OrchestrationEngine`).

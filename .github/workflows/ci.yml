@@ -7,18 +7,21 @@ name: CI
 #     Windows-only Credential Manager tests (PD-9), using GitHub's
 #     native Postgres service container for the claim/lease concurrency
 #     tests (PD-5) — this combination is well-supported and reliable on
-#     Linux runners.
+#     Linux runners. This is also where DockerSandboxedExecutorTests
+#     (PD-27) run — ubuntu-latest has Docker's Linux containers natively.
 #   - test-windows (windows-latest): the full SabEngine.Execution.Tests
 #     project, including WindowsCredentialManagerSecretStoreTests, which
 #     can only run on Windows at all (it P/Invokes advapi32.dll). This
 #     also re-verifies PowerShell interop specifically on Windows, which
-#     is sab-engine's actual real-world target OS.
+#     is sab-engine's actual real-world target OS. DockerSandboxedExecutorTests
+#     (PD-27) are excluded here — they need Linux containers, and
+#     GitHub's windows-latest runners default to Windows containers.
 #
 # Deliberately NOT one Windows job running everything: GitHub-hosted
 # Windows runners running Linux Docker containers (needed for
-# docker-compose.yml's Postgres) has historically been a flaky
-# combination, not a reliable one — splitting by OS avoids relying on
-# that entirely.
+# docker-compose.yml's Postgres, and now DockerSandboxedExecutorTests
+# too) has historically been a flaky combination, not a reliable one —
+# splitting by OS avoids relying on that entirely.
 
 on:
   push:
@@ -86,14 +89,14 @@ jobs:
       - name: Build
         run: dotnet build --no-restore
 
-      - name: Test SabEngine.Execution.Tests (includes Windows Credential Manager tests)
+      - name: Test SabEngine.Execution.Tests (includes Windows Credential Manager tests; excludes the Linux-container-only Docker sandboxing tests)
         # --blame-hang-timeout: if a test hangs instead of failing
         # normally, dotnet test kills it after 2 minutes and writes a
         # diagnostic dump identifying exactly which test was stuck,
         # rather than the whole job silently running until the
         # job-level timeout-minutes above kills it with no useful
         # information at all. See pre-development-checklist.md, PD-10.
-        run: dotnet test tests/SabEngine.Execution.Tests/SabEngine.Execution.Tests.csproj --no-build --blame-hang-timeout 2m --blame-hang-dump-type mini
+        run: dotnet test tests/SabEngine.Execution.Tests/SabEngine.Execution.Tests.csproj --no-build --filter "FullyQualifiedName!~DockerSandboxedExecutorTests" --blame-hang-timeout 2m --blame-hang-dump-type mini
 
       - name: Upload hang dump (if the test step above actually hung)
         if: failure()

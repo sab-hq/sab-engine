@@ -23,8 +23,8 @@ Plain-language guides to the core concepts — no prior context needed:
 
 ## Before development starts
 
-- [**Pre-development checklist**](docs/pre-development-checklist.md) — living tracker of what's left to do before writing code, with unique IDs and status (PD-1 through PD-30)
-- [**Checklist 02**](docs/checklist-02.md) — continuation of the above, for anything that comes up after PD-30
+- [**Checklist 02**](docs/checklist-02.md) — **the active tracker** for anything currently in progress or not started, with unique IDs and status
+- [**Pre-development checklist**](docs/pre-development-checklist.md) — **closed historical record** of everything completed under the original PD-1 through PD-30 scope; see Checklist 02 for what's happening now
 - [**Changelog**](CHANGELOG.md) — short, scannable record of what's actually shipped, in order
 
 ## Build phases
