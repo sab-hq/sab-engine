@@ -41,7 +41,7 @@ Summary: **47/47 locally-runnable tests pass**, and the build is clean. This is 
 
 ### 3. Security hygiene issues
 - **Stored XSS in the approval UI.** `SabEngine.Api/Program.cs:151` renders the agent's `plan.Reasoning` (model-produced, arbitrary text) into HTML with no encoding. A model response containing markup would render as markup in an approver's browser. The workflow ID, target, and other DB-backed values interpolated in the same templates carry the same risk class, though those are at least not model-produced.
-- **Unicode escape bugs in claim service messages.** `WorkflowRunClaimService.cs:23` and three other doc comments there contain literal `\u2014` in place of an em dash. These leak into runtime strings (the "nothing to do right now" guidance) instead of rendering as `—`. Cosmetic, but a real defect introduced when the code was authored.
+- **Unicode escapes in claim service doc comments (cosmetic only).** `WorkflowRunClaimService.cs` has seven literal `\u2014` escape sequences instead of a real em dash (`—`) — all of them in `///` XML doc comments and `//` code comments, none in executable code. They never appear at runtime; they just render as the literal text `\u2014` in IDE tooltips/IntelliSense. Worth fixing for polish, but not a runtime defect.
 - **Dev DB credentials hardcoded as the code fallback.** `SabEngineDbContextFactory.cs:22` embeds the docker-compose credentials directly in the design-time factory. They're explicitly local-dev-only (correctly flagged as not real secrets), but the hardcoded fallback means any future path that instantiates the factory without the env var quietly uses them.
 - **Log-injection surface (minor).** `SabAgent` rethrows `PlanValidationException` messages that embed raw model output (and the run's `target`/`workflowId`), so an exception message can carry model-controlled text into logs.
 
@@ -63,7 +63,7 @@ Summary: **47/47 locally-runnable tests pass**, and the build is clean. This is 
 
 1. **Add an explicit item for the `Executing` re-claim gap** in `checklist-02.md` — it's a small, well-understood piece of PD-33 (lease-expiry re-claim mirroring the PD-5 pattern) and it's the only thing standing between a crashed worker and a permanently stuck run.
 2. **Fix the stored-XSS surface in the approval UI** before anyone uses it against a real server — encode interpolated values in the `Program.cs` HTML templates (or route the UI through a templating path that HTML-encodes by default).
-3. **Fix the `\u2014` leaks** in `WorkflowRunClaimService.cs` (cosmetic, one-line each).
+3. **Fix the `\u2014` escapes** in `WorkflowRunClaimService.cs` doc comments (cosmetic — IDE tooltips only, never runtime).
 4. **Bind the decision endpoint to the exact plan shown**, or add a guard so a revised plan can't be silently decided against.
 5. Delete `tests/modules-test-output.txt` and add `tests/*.txt`-style ignores if it was a one-off.
 

@@ -22,6 +22,16 @@ builder.Services.AddScoped<WorkflowRunStateMachine>();
 
 var app = builder.Build();
 
+// HTML-encodes any value interpolated into a page — required for every
+// DB-backed or model-produced string rendered below (WorkflowId, Target,
+// and especially Plan.Reasoning, which is meant to eventually come from
+// a real LLM once PD-6's still-open model-wiring item is done). Found
+// missing entirely in a code review (docs/code-review-findings.md) —
+// a real stored-XSS gap, not a hypothetical one, since nothing here
+// previously encoded model- or DB-controlled text before writing it
+// into HTML.
+static string Html(string? value) => System.Net.WebUtility.HtmlEncode(value ?? string.Empty);
+
 // Plain (non-interpolated) raw strings — no `$` prefix, so braces below
 // are just literal CSS syntax, nothing needs escaping. Kept separate
 // from the interpolated HTML templates below specifically to avoid
@@ -57,8 +67,8 @@ app.MapGet("/", async (SabEngineDbContext db) =>
         ? "<tr><td colspan=\"4\"><em>Nothing pending approval right now.</em></td></tr>"
         : string.Join("", pending.Select(w => $"""
             <tr>
-              <td>{w.WorkflowId}</td>
-              <td>{w.Target}</td>
+              <td>{Html(w.WorkflowId)}</td>
+              <td>{Html(w.Target)}</td>
               <td>{w.CreatedAt:u}</td>
               <td><a href="/runs/{w.Id}">Review &rarr;</a></td>
             </tr>
@@ -131,24 +141,24 @@ app.MapGet("/runs/{id:guid}", async (Guid id, SabEngineDbContext db) =>
 
     var stepsHtml = plan is null
         ? "<li><em>No plan found for this run.</em></li>"
-        : string.Join("", plan.Steps.Select(s => $"<li><strong>{s.ModuleId}</strong> (v{s.ModuleVersion})</li>"));
+        : string.Join("", plan.Steps.Select(s => $"<li><strong>{Html(s.ModuleId)}</strong> (v{Html(s.ModuleVersion)})</li>"));
 
     var html = $"""
         <!doctype html>
         <html>
         <head>
           <meta charset="utf-8" />
-          <title>Review: {run.WorkflowId}</title>
+          <title>Review: {Html(run.WorkflowId)}</title>
           <style>{RunCss}</style>
         </head>
         <body>
           <p><a href="/">&larr; Back to pending approvals</a></p>
-          <h1>{run.WorkflowId}</h1>
-          <p><strong>Target:</strong> {run.Target}</p>
+          <h1>{Html(run.WorkflowId)}</h1>
+          <p><strong>Target:</strong> {Html(run.Target)}</p>
           <p><strong>Proposed steps:</strong></p>
           <ol>{stepsHtml}</ol>
           <p><strong>Agent's reasoning:</strong></p>
-          <div class="reasoning">{plan?.Reasoning}</div>
+          <div class="reasoning">{Html(plan?.Reasoning)}</div>
           <form method="post" action="/runs/{run.Id}/decide" style="margin-top: 2rem;">
             <label>Your name:
               <input type="text" name="approver" required />

@@ -22,12 +22,12 @@ namespace SabEngine.Orchestration;
 public sealed class WorkflowRunClaimService(SabEngineDbContext db)
 {
     /// <summary>
-    /// States where a background worker \u2014 not a human, not an
-    /// already-in-flight process \u2014 is the next thing that needs to act:
+    /// States where a background worker — not a human, not an
+    /// already-in-flight process — is the next thing that needs to act:
     /// draft/redraft a plan (Requested, Declined), execute an approved
     /// plan (Approved), or trigger a rollback (Failed). PlanDrafted,
     /// PendingApproval, Executing, Completed, and RolledBack are
-    /// deliberately excluded \u2014 they're either mid-flight under a worker
+    /// deliberately excluded — they're either mid-flight under a worker
     /// that already holds them, waiting on a human, or terminal.
     /// </summary>
     private static readonly WorkflowState[] ClaimableStates =
@@ -43,7 +43,7 @@ public sealed class WorkflowRunClaimService(SabEngineDbContext db)
 
     /// <summary>
     /// Attempts to claim the oldest eligible run. Returns null if nothing
-    /// is currently claimable \u2014 that's a normal outcome, not an error;
+    /// is currently claimable — that's a normal outcome, not an error;
     /// callers should treat it as "nothing to do right now" and poll
     /// again later.
     /// </summary>
@@ -63,7 +63,7 @@ public sealed class WorkflowRunClaimService(SabEngineDbContext db)
         {
             // The atomic step: this UPDATE only succeeds if the row still
             // matches the same unclaimed-or-expired condition at write
-            // time, not just at the SELECT above \u2014 that's what actually
+            // time, not just at the SELECT above — that's what actually
             // prevents two workers from both winning the same run. If
             // another worker claimed it in between our SELECT and this
             // UPDATE, rowsAffected is 0 and we just move on to the next
@@ -86,11 +86,11 @@ public sealed class WorkflowRunClaimService(SabEngineDbContext db)
 
     /// <summary>
     /// Releases a claim once a worker has handed a run off to a state it
-    /// no longer owns (e.g. after Requested \u2192 PlanDrafted \u2192
+    /// no longer owns (e.g. after Requested → PlanDrafted →
     /// PendingApproval, which is now waiting on a human, not this
-    /// worker). Not strictly required for correctness \u2014 a run outside
+    /// worker). Not strictly required for correctness — a run outside
     /// the claimable states is never selected as a candidate regardless
-    /// \u2014 but keeps ClaimedByWorkerId from misleadingly showing a run as
+    /// — but keeps ClaimedByWorkerId from misleadingly showing a run as
     /// "still held" by a worker that's actually done with it.
     /// </summary>
     public async Task ReleaseClaimAsync(Guid workflowRunId, CancellationToken cancellationToken = default)
