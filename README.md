@@ -46,3 +46,4 @@ Plain-language guides to the core concepts — no prior context needed. Full ind
 - [**Open questions**](docs/open-questions.md) — tracked design decisions, resolved and outstanding
 - [**sab-engine overview**](docs/learn/sab-engine-overview.md) — a consolidated reference for this repo specifically
 - [**WSUS connector spec**](docs/wsus-connector-spec.md) — technical spec for the first partnership-oriented integration
+- [**Code review findings**](docs/code-review-findings.md) — an independent review of the codebase (2026-08-12): verification results, what's strong, and prioritized gaps/recommendations
